@@ -18,12 +18,16 @@ class DataModule:
         self.data_dir = data_dir
         self.batch_size = batch_size
         os.makedirs(data_dir, exist_ok=True)
-        # Load backbone once if needed
-        self.mobilenet = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1)
-        self.mobilenet.eval()
-        for param in self.mobilenet.parameters():
-            param.requires_grad = False
-            
+        # MobileNet loaded lazily on first call to get_mobilenet_features_task
+        self.mobilenet = None
+
+    def _ensure_mobilenet(self):
+        if self.mobilenet is None:
+            self.mobilenet = models.mobilenet_v2(weights=models.MobileNet_V2_Weights.IMAGENET1K_V1)
+            self.mobilenet.eval()
+            for param in self.mobilenet.parameters():
+                param.requires_grad = False
+
     def get_mobilenet_features_task(self, classes=(0, 1), n_samples=1000):
         """Loads CIFAR-10, passes through MobileNetV2, then PCA to 4 features."""
         transform = transforms.Compose([
@@ -31,6 +35,7 @@ class DataModule:
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
         ])
+        self._ensure_mobilenet()
         train_set = torchvision.datasets.CIFAR10(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.CIFAR10(root=self.data_dir, train=False, download=True, transform=transform)
         

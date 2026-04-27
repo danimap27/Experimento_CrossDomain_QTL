@@ -2,6 +2,14 @@ __pycache__/
 *.pyc
 *.pyo
 data/
+torch_cache/
+results/
+logs/
+results_seed_*.json
+results_noisy_*.json
+cmds_*.txt
+run_noisy_5seeds.log
+*.png
 *.aux
 *.bbl
 *.blg

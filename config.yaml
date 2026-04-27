@@ -1,0 +1,73 @@
+# =============================================================================
+# Cross-Domain QTL — manager.py config
+# 5 seeds × full pipeline (Exp1 + Exp2 + Exp3) under IBM Heron r2 noise.
+# =============================================================================
+
+experiment_name: "crossdomain_qtl"
+conda_env: "qtl"
+slurm_script: "core/slurm_generic.sh"
+
+output_dir: "./results"
+tables_dir: "./paper/tables"
+
+# ── Sweep dimensions ─────────────────────────────────────────────────────────
+seeds: [0, 1, 2, 3, 4]
+
+# Single experiment "model" wrapper — full 3-experiment pipeline.
+models:
+  - name: "full"
+    label: "Full Pipeline"
+
+# Fixed hyperparameters (kept here so generate_tables can read them).
+epochs: 10
+lr: 0.05
+noise: true
+
+# ── Phases ───────────────────────────────────────────────────────────────────
+phases:
+  - id: "1"
+    name: "noisy_5seeds"
+    file: "cmds_1_noisy_5seeds.txt"
+    description: "Phase 1 — 5 seeds, Heron r2 noise, full pipeline"
+
+expected_runs: 5
+
+# ── Aggregation hooks (read by monitor) ──────────────────────────────────────
+results:
+  file_pattern: "*.csv"
+  group_by: ["model"]
+  metrics: ["drop_qtl", "drop_base", "qtl_acc", "scr_acc"]
+
+# ── LaTeX labels ─────────────────────────────────────────────────────────────
+labels:
+  model:
+    full: "\\textsc{Full Pipeline}"
+
+# ── LaTeX tables ─────────────────────────────────────────────────────────────
+tables:
+  - name: "tab_forgetting"
+    caption: "Experiment 1 — catastrophic forgetting drop (lower is better)."
+    label: "tab:forgetting"
+    rows: "model"
+    metrics:
+      - column: "drop_base"
+        label: "Baseline Drop (\\%)"
+        pct: false
+      - column: "drop_qtl"
+        label: "QTL Drop (\\%)"
+        pct: false
+
+  - name: "tab_crossdomain"
+    caption: "Experiment 3 — target accuracy (\\%) under cross-domain priors."
+    label: "tab:crossdomain"
+    rows: "model"
+    metrics:
+      - column: "scr_acc"
+        label: "Scratch"
+        pct: false
+      - column: "qtl_acc"
+        label: "QTL-Syn"
+        pct: false
+      - column: "mob_qtl_acc"
+        label: "QTL-Mob"
+        pct: false
