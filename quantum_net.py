@@ -9,6 +9,29 @@ HERON_R2_NOISE = {
     "p_readout": 1.5e-2,  # readout / measurement error
 }
 
+# Older / lower-fidelity NISQ reference (representative of pre-Heron generation
+# IBM Eagle / Falcon devices: ~10x worse 2Q errors).
+LEGACY_NISQ_NOISE = {
+    "p_1q": 1.0e-3,
+    "p_2q": 1.5e-2,
+    "p_readout": 3.0e-2,
+}
+
+NOISE_PROFILES = {
+    "ideal":       None,
+    "heron_r2":    HERON_R2_NOISE,
+    "legacy_nisq": LEGACY_NISQ_NOISE,
+}
+
+
+def get_noise_profile(name: str):
+    """Return (noise_enabled, noise_params) for a profile name."""
+    if name not in NOISE_PROFILES:
+        raise ValueError(f"Unknown noise profile {name!r}. "
+                         f"Available: {list(NOISE_PROFILES)}")
+    params = NOISE_PROFILES[name]
+    return (params is not None), params
+
 
 class HybridQuantumNet(nn.Module):
     """

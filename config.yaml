@@ -1,6 +1,6 @@
 # =============================================================================
 # Cross-Domain QTL — manager.py config
-# 5 seeds × full pipeline (Exp1 + Exp2 + Exp3) under IBM Heron r2 noise.
+# Sweep: 3 noise profiles × 5 seeds × full pipeline (Exp1+2+3) = 15 runs.
 # =============================================================================
 
 experiment_name: "crossdomain_qtl"
@@ -13,24 +13,46 @@ tables_dir: "./paper/tables"
 # ── Sweep dimensions ─────────────────────────────────────────────────────────
 seeds: [0, 1, 2, 3, 4]
 
-# Single experiment "model" wrapper — full 3-experiment pipeline.
+# Each "model" is a noise profile. runner.py looks up the noise params via
+# quantum_net.get_noise_profile(name).
 models:
-  - name: "full"
-    label: "Full Pipeline"
+  - name: "ideal"
+    label: "Ideal (noiseless)"
+  - name: "heron_r2"
+    label: "IBM Heron r2"
+  - name: "legacy_nisq"
+    label: "Legacy NISQ"
 
-# Fixed hyperparameters (kept here so generate_tables can read them).
+# Fixed hyperparameters
 epochs: 10
 lr: 0.05
-noise: true
 
 # ── Phases ───────────────────────────────────────────────────────────────────
+# Three phases (one per noise profile) so they can be launched/monitored
+# independently or chained via [F] Full Pipeline.
 phases:
   - id: "1"
-    name: "noisy_5seeds"
-    file: "cmds_1_noisy_5seeds.txt"
-    description: "Phase 1 — 5 seeds, Heron r2 noise, full pipeline"
+    name: "ideal"
+    file: "cmds_1_ideal.txt"
+    description: "Phase 1 — 5 seeds, noiseless"
+    filters:
+      model: "ideal"
 
-expected_runs: 5
+  - id: "2"
+    name: "heron_r2"
+    file: "cmds_2_heron_r2.txt"
+    description: "Phase 2 — 5 seeds, IBM Heron r2 noise"
+    filters:
+      model: "heron_r2"
+
+  - id: "3"
+    name: "legacy_nisq"
+    file: "cmds_3_legacy_nisq.txt"
+    description: "Phase 3 — 5 seeds, legacy NISQ noise (~10x errors)"
+    filters:
+      model: "legacy_nisq"
+
+expected_runs: 15
 
 # ── Aggregation hooks (read by monitor) ──────────────────────────────────────
 results:
@@ -41,7 +63,9 @@ results:
 # ── LaTeX labels ─────────────────────────────────────────────────────────────
 labels:
   model:
-    full: "\\textsc{Full Pipeline}"
+    ideal:       "\\textsc{Ideal}"
+    heron_r2:    "\\textsc{Heron r2}"
+    legacy_nisq: "\\textsc{Legacy NISQ}"
 
 # ── LaTeX tables ─────────────────────────────────────────────────────────────
 tables:
@@ -55,6 +79,21 @@ tables:
         pct: false
       - column: "drop_qtl"
         label: "QTL Drop (\\%)"
+        pct: false
+
+  - name: "tab_topology"
+    caption: "Experiment 2 — Task A retained accuracy (\\%) per ansatz."
+    label: "tab:topology"
+    rows: "model"
+    metrics:
+      - column: "acc_A_ansatz_A"
+        label: "Strongly Ent."
+        pct: false
+      - column: "acc_A_ansatz_B"
+        label: "Basic Ent."
+        pct: false
+      - column: "acc_A_ansatz_C"
+        label: "TTN"
         pct: false
 
   - name: "tab_crossdomain"

@@ -67,7 +67,9 @@ def execute_run(run_spec: dict, cfg: dict, machine_id: str = "local"):
     model   = run_spec["model"]
     epochs  = int(cfg.get("epochs", 10))
     lr      = float(cfg.get("lr", 0.05))
-    noise   = bool(cfg.get("noise", True))
+    # `model` doubles as the noise-profile selector
+    from quantum_net import get_noise_profile
+    noise, noise_params = get_noise_profile(model)
 
     results_dir = cfg.get("output_dir", "./results")
     run_dir = Path(results_dir) / run_id
@@ -83,10 +85,7 @@ def execute_run(run_spec: dict, cfg: dict, machine_id: str = "local"):
     logger.info(f"[START] {run_id} seed={seed} model={model} noise={noise}")
     t0 = time.time()
 
-    # Invoke the in-repo pipeline as a library call to avoid double-loading data
-    # if execute_run is called for many seeds in sequence.
-    from main import (run_single_seed, parse_args)
-    from quantum_net import HERON_R2_NOISE
+    from main import run_single_seed
     from data_module import DataModule
     from experiment_runner import ExperimentRunner  # noqa: F401 (used by run_single_seed)
 
@@ -103,12 +102,12 @@ def execute_run(run_spec: dict, cfg: dict, machine_id: str = "local"):
         (mn_train, mn_test),
         (mob_train, mob_test),
     )
-    model_kwargs = {"noise": noise, "noise_params": HERON_R2_NOISE if noise else None}
+    model_kwargs = {"noise": noise, "noise_params": noise_params}
     runner_kwargs = {"data_module": data_mod, "epochs": epochs, "lr": lr}
 
     payload = run_single_seed(seed, runner_kwargs, model_kwargs, loaders)
-    payload["config"] = {"noise": noise, "noise_params": HERON_R2_NOISE if noise else None,
-                         "epochs": epochs, "lr": lr}
+    payload["config"] = {"noise": noise, "noise_params": noise_params,
+                         "noise_profile": model, "epochs": epochs, "lr": lr}
     with open(json_path, "w") as f:
         json.dump(payload, f, indent=2)
 
