@@ -1,0 +1,22 @@
+% Experiment 3 (journal version).
+% Cross-domain initialisation: target (MNIST 2/3) accuracy per initialisation
+% paradigm, with the paired contrast against the scratch reference.
+% Mean +/- std over five seeds. p-values are Holm-adjusted within the family.
+\begin{table}[ht]
+\centering
+\caption{Experiment 3. Target accuracy (percentage) on the MNIST 2/3 test set
+for the three initialisation paradigms, with the paired difference of the
+synthetic prior against the scratch reference and its Holm-adjusted
+significance from a paired $t$-test over five seeds. No contrast falls below
+the 0.05 level in the current five-seed campaign.}
+\label{tab:exp3}
+\begin{tabular}{lccccc}
+\toprule
+Noise profile & Scratch & QTL-Syn & QTL-Mob & $\delta$ (Syn--Scr) & $p_\text{Holm}$ \\
+\midrule
+Ideal       & $90.10 \pm 2.13$ & $90.90 \pm 1.60$ & $89.70 \pm 1.15$ & $+0.80$ & $1.000$ \\
+IBM Heron r2 & $90.80 \pm 1.72$ & $89.90 \pm 0.65$ & $88.60 \pm 1.52$ & $-0.90$ & $0.430$ \\
+Legacy NISQ & $89.60 \pm 2.61$ & $89.90 \pm 1.39$ & $89.70 \pm 1.72$ & $+0.30$ & $1.000$ \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,30 @@
+% Corrected Experiment 2 table (Paper 191 revision).
+% Replaces the table whose rows were labelled "final Task A accuracy after Task B"
+% while reporting the accuracy measured immediately after Task A training.
+% acc_A(init)  = accuracy on Task A after the Task A phase  (JSON field exp2.*.acc_A)
+% acc_A(post)  = accuracy on Task A at the last epoch of the Task B phase (exp2.*.acc_history[-1])
+\begin{table}[ht]
+\centering
+\caption{Experiment 2 (corrected). Task A accuracy before and after the sequential exposure to Task B, with the resulting forgetting drop, for the three ans\"atze. Mean $\pm$ std over five seeds. $\mathrm{Acc}_A^{\text{init}}$ is measured at the end of the Task A phase and $\mathrm{Acc}_A^{\text{post}}$ at the end of the Task B phase, on the frozen Task A test set.}
+\label{tab:exp2}
+\begin{tabular}{llccccc}
+\toprule
+Noise profile & Ansatz & $\mathrm{Acc}_A^{\text{init}}$ & $\mathrm{Acc}_A^{\text{post}}$ & $\Delta_A$ & $\mathrm{Acc}_B$ & Retention \\
+\midrule
+\multirow{3}{*}{Ideal}
+  & SE  & $96.30 \pm 0.91$ & $23.40 \pm 1.39$ & $72.90$ & $90.20 \pm 1.60$ & $0.24$ \\
+  & BE  & $72.90 \pm 1.52$ & $62.50 \pm 4.60$ & $10.40$ & $57.90 \pm 2.33$ & $0.86$ \\
+  & TTN & $95.40 \pm 1.56$ & $23.80 \pm 2.08$ & $71.60$ & $90.40 \pm 0.89$ & $0.25$ \\
+\midrule
+\multirow{3}{*}{Heron r2}
+  & SE  & $96.50 \pm 0.61$ & $24.80 \pm 1.04$ & $71.70$ & $89.60 \pm 1.14$ & $0.26$ \\
+  & BE  & $73.10 \pm 1.34$ & $62.50 \pm 4.64$ & $10.60$ & $58.20 \pm 2.36$ & $0.86$ \\
+  & TTN & $95.40 \pm 1.56$ & $23.40 \pm 1.78$ & $72.00$ & $89.80 \pm 0.67$ & $0.25$ \\
+\midrule
+\multirow{3}{*}{Legacy NISQ}
+  & SE  & $96.70 \pm 0.57$ & $24.60 \pm 3.23$ & $72.10$ & $89.90 \pm 2.27$ & $0.25$ \\
+  & BE  & $72.30 \pm 0.91$ & $63.40 \pm 3.23$ & $8.90$  & $58.30 \pm 1.25$ & $0.88$ \\
+  & TTN & $95.30 \pm 1.20$ & $22.00 \pm 0.79$ & $73.30$ & $90.60 \pm 0.74$ & $0.23$ \\
+\bottomrule
+\end{tabular}
+\end{table}

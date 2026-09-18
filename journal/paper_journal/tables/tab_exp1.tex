@@ -1,0 +1,17 @@
+% Corrected Experiment 1 table (Paper 191 revision).
+% Values recomputed from results/*/results_seed_*.json (5 seeds per noise profile).
+% Columns: mean, bootstrap 95% CI of the drop, paired reduction vs baseline, significance.
+\begin{table}[ht]
+\centering
+\caption{Experiment 1 (corrected). Forgetting drop $\Delta_A$ on Task A, in percentage points (mean $\pm$ std over five seeds), with the paired reduction obtained by synthetic pre-training and its 95\% bootstrap confidence interval. Significance from a two-sided paired $t$-test over seeds (df$=4$); the Wilcoxon signed-rank test cannot reach $p<0.05$ with five seeds. The QTL arm in this experiment runs Task A at $\eta=0.01$ and Task B at $\eta=0.005$, against $\eta=0.05$ for both tasks in the baseline; the reduction therefore mixes the effect of the initialization with the effect of the optimisation regime (see the learning-rate control experiment of the revision).}
+\label{tab:exp1}
+\begin{tabular}{lcccc}
+\toprule
+Noise profile & Baseline $\Delta_A$ & QTL $\Delta_A$ & Reduction & $p$ \\
+\midrule
+Ideal       & $72.10 \pm 2.61$ & $65.10 \pm 5.09$ & $7.00$ [1.10, 12.40] & $0.099$ \\
+Heron r2    & $72.90 \pm 2.01$ & $65.10 \pm 3.73$ & $7.80$ [4.50, 12.30] & $0.028$ \\
+Legacy NISQ & $70.50 \pm 7.19$ & $61.20 \pm 4.04$ & $9.30$ [0.80, 17.10] & $0.116$ \\
+\bottomrule
+\end{tabular}
+\end{table}
