@@ -331,6 +331,14 @@ and keep the paper writing in parallel.
 - Corrected figures and LaTeX tables built from the raw JSON payloads, a
   draft response-to-reviewers and a coauthor message draft live in the team
   review packet (see Section 10). Both audits agree on the essential findings.
+- `journal/paper_journal/` — **complete journal manuscript draft v0.1**
+  (elsarticle, 18 pages in preprint mode, self-contained LaTeX + bib +
+  corrected figures and tables) covering the repositioned Introduction, the
+  related-work axes with a quantitative positioning table, the separated
+  Methodology and Experimental Setup sections, the corrected Experiments 1-3
+  with paired statistics, the preliminary mechanism analysis, and the
+  declarations block. All numbers still come from the five-seed campaign and
+  are flagged in the source header for replacement by the extended campaign.
 
 ## 10. Related working material (team review packet)
 
