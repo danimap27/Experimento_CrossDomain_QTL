@@ -105,6 +105,38 @@ stray unexpanded `full` row (a duplicated noise profile). The `full` results
 directory duplicates `heron_r2` (verified: identical except 1 value across 5
 seeds). Exclude `full` from all reporting.
 
+**A7 — TTN wiring and readout are inconsistent (found during mechanism-probe
+construction).** The manuscript states that the TTN's active wires "combine
+towards qubits 0 and 1, where the readout occurs". In the implementation the
+CNOT chain propagates towards the **last** wire (for 4 qubits the final block
+is `CNOT(1 -> 3)`, and the readout is `Z_0, Z_1`). Consequently the parameters
+of the `{2,3}` subtree and the `RZ` on wire 3 never influence the measured
+expectations: their gradients are exactly zero (confirmed empirically:
+`Var[grad]` median ~1e-33 for those coordinates in the barren-plateau probe).
+The evaluated "TTN" is therefore effectively a much smaller circuit than the
+18-parameter ansatz the paper describes (about half the parameters are
+functionally dead). Fix for the journal version: align the tree with the
+standard definition (combine towards the readout wires, as in Grant et al.) or
+move the readout to the root wires, document it exactly, and re-run.
+This also affects how the topology comparison of Experiment 2 is interpreted.
+
+**A8 — Experiment 1 does not isolate pre-training from the learning-rate
+schedule.** The QTL arm runs with lr 0.01/0.005 while the scratch baseline
+runs at 0.05, so the reported 7-9 pp gain mixes the initialization effect with
+the optimization regime. Workstream A must include the full 2x2 design
+(scratch/synthetic x lr high/low) plus the EWC and rehearsal arms.
+
+**A9 — Figure scripts contain hardcoded values.** Several plotting scripts in
+the repository carry literal numbers instead of reading the JSON payloads,
+which risks silently regenerating figures that do not match the data.
+Regenerate every figure from stored results only.
+
+**A10 — The three noise profiles are statistically indistinguishable in the
+current results** (<0.8 pp between profiles, p>0.1). The noise-robustness
+narrative needs either the stronger support of the 20-seed rerun or a softer
+claim, and the total-error budget of the 4-qubit circuits should be reported so
+the reader can see why the profiles barely separate.
+
 ---
 
 ## 4. Journal experiment campaign
@@ -268,3 +300,53 @@ and keep the paper writing in parallel.
   p<0.001 (15 pairs); per-profile significance reached only under Heron r2
   at n=5 (p=0.028) — the 20-seed rerun is required for the journal tables.
 - Corrected Experiment 2 retention values (finding A1).
+- `analysis/mechanism/gradient_probe.py` — first mechanism evidence (D1):
+  - **Barren-plateau sweep** (Var[grad] of a global cost over random parameter
+    draws, 150 samples per point): SEL decays ~exponentially with qubit count
+    (5.2e-3 at 4q, 6.5e-4 at 6q, 1.4e-4 at 8q, 3.4e-5 at 10q, 1.2e-5 at 12q)
+    while TTN decays far more gently (6.8e-3, 1.8e-3, 1.0e-3, 5.4e-4,
+    3.6e-4). At 12 qubits the hierarchical topology keeps ~31x more gradient
+    variance than SEL. Direct evidence for the scalability argument (R2.3).
+  - **Task-A gradient at theta_0 vs random** (4-qubit SEL, 10 random inits):
+    |grad| = 3.02 at theta_0 vs 0.35 +/- 0.16 at random (about 8.5x larger),
+    per-coordinate variance 0.209 vs 0.0036 +/- 0.0028, fraction of
+    near-zero coordinates ~0.14 in both cases. Interpretation caveat: theta_0
+    is not a minimum of Task A (its Task-A loss, 1.83, is above the random
+    mean of 0.78), so the result is best read as "the synthetic prior lands
+    in an active region of the landscape rather than the weak-gradient region
+    random initialization starts from", which is precisely the mechanism the
+    journal version must characterize fully in W2.
+  - Parameter-distribution note: post-pre-training VQC angles occupy
+    [-7.97, 7.46], i.e. far outside the canonical [-pi, pi] interval, with
+    mean 3.20 and std 2.73. The role of angle wrapping deserves an explicit
+    treatment in the parameter-distribution analysis.
+  - **Technical caveat (T1)**: second-order autodiff through the PennyLane
+    TorchLayer is not trustworthy (classical control agrees to ~1e-9 across
+    computation paths, the hybrid model disagrees at O(1), eigenvalues
+    0.48 vs 0.55). Curvature/sharpness analyses in W2 must use parameter-shift
+    or double-precision finite differences with an FD self-test; the
+    `hess` probe ships disabled-by-warning with diagnostics under
+    `analysis/mechanism/diagnostics/`.
+  Outputs land in `analysis/mechanism/outputs/`.
+- Corrected figures and LaTeX tables built from the raw JSON payloads, a
+  draft response-to-reviewers and a coauthor message draft live in the team
+  review packet (see Section 10). Both audits agree on the essential findings.
+
+## 10. Related working material (team review packet)
+
+Companion packet prepared in parallel (17 Sep 2026), in Spanish, for the
+team: `~/papers/reviews/QAI2026-191/`. It contains the full review report, the
+data-integrity findings H1-H9 (coincident with audit findings A1-A10 here), the
+experiment specification E1-E8, a draft response-to-reviewers, corrected
+figures/tables generated only from the raw JSON, and a message draft for the
+coauthors (F. Martínez-Álvarez, D. Gutiérrez-Avilés).
+
+Housekeeping notes from that packet that affect this plan:
+
+- The LaTeX source of the *submitted* PDF ("Mitigating" version) is not on the
+  homelab; the local `.tex` files correspond to earlier drafts. The journal
+  manuscript will therefore be written from the corrected skeleton rather than
+  patched onto the submitted source.
+- The two audits should be treated as one workstream: this document is the
+  working plan (repo, English), the packet is the review dossier and the
+  artifact set (Spanish) for the team.
