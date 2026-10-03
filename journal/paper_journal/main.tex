@@ -550,12 +550,23 @@ scikit-learn 1.8.0 for the feature reduction, and NumPy 2.4.3. The ideal
 profile runs on the state-vector device with the adjoint differentiation
 method and the noisy profiles run on the density-matrix device with
 backpropagation. The optimiser is Adam with a batch size of 32 and a
-learning rate of 0.05 during pre-training. All experiments run on the
-Hercules cluster of the Centro de Inform\'atica Cient\'ifica de Andaluc\'ia,
-on standard nodes with four CPU cores and eight gigabytes of memory, as
-independent jobs of SLURM arrays. The complete five-seed campaign over the
-three noise profiles consists of forty-five sequential trainings per
-experiment. The classical front-end of the image sources, namely the
+learning rate of 0.05 during pre-training. The five-seed campaign of the
+conference analysis run on the Hercules cluster of the Centro de
+Inform\'atica Cient\'ifica de Andaluc\'ia, on standard nodes with four CPU
+cores and eight gigabytes of memory, as independent jobs of SLURM arrays.
+The controlled re-run of Experiment~1 reported in
+Section~\ref{sec:results} was executed outside that cluster, because the
+cluster's access VPN was unavailable at run time, on two local workstations:
+an Intel Core i5-8500 with six cores and an Intel Core i7-5820K with six
+cores and twelve hardware threads, with one single-threaded worker per
+run. The software stack of the controlled re-run is Python 3.12.3, PyTorch
+2.14.0, PennyLane 0.45.1, scikit-learn 1.9.1 and NumPy 2.5.3, identical on
+both machines. Every stored run records the machine identity of the node
+that executed it (\texttt{hostname} together with the OS machine
+identifier), never a placeholder, so the per-node provenance of each
+measurement is auditable from the released payloads. The complete
+five-seed campaign over the three noise profiles consists of forty-five
+sequential trainings per experiment. The classical front-end of the image sources, namely the
 MobileNetV2 feature extraction and the principal-component reduction, is
 accounted separately as the reproduction cost of the data preparation and
 not as part of the quantum training loop; the end-to-end balance of the
@@ -610,8 +621,95 @@ from the rate of the random reference, as the caption of Table~\ref{tab:exp1}
 records, so the measured reduction mixes the effect of the initialisation
 with the effect of the optimisation regime. The extended protocol repeats
 the experiment with matched learning rates and adds regularisation and
-replay baselines, and the conclusions of this section are conditional on
-that control.
+replay baselines; that control is the subject of the next subsection, and
+the conclusions of this one are conditional on it.
+
+\subsection{Experiment 1 (controlled re-run): matched rates and
+continual-learning baselines}
+\label{sec:exp1_controlled}
+
+Table~\ref{tab:exp1_controlled} reports the controlled re-run of
+Experiment~1 as a $2{\times}2$ design that crosses the initialisation of
+the quantum layer (scratch, synthetic prior) with the learning-rate
+regime of the sequential phases (the single rate
+$\eta_A{=}\eta_B{=}0.05$ of the conference protocol, or the gentler pair
+$\eta_A{=}0.01$, $\eta_B{=}0.005$ used by the pre-trained arm of
+Table~\ref{tab:exp1}), so that the initialisation effect is observed at
+matched rates. The design is augmented with three continual-learning
+baselines applied to the same variational classifier: elastic weight
+consolidation with penalty strength $\lambda \in \{10^2, 10^3, 10^4\}$
+computed from the empirical Fisher diagonal at the Task~A optimum;
+experience replay with a buffer holding $25\%$ of the Task~A training
+set; and Dark Experience Replay++ with the same buffer. The campaign
+covers twenty seeds per cell under the ideal and Heron~r2 noise
+profiles, 360 sequential trainings in total; every stored run carries
+its absolute accuracies, the derived metrics and the identity of the
+executing node.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.95\linewidth]{figures/fig_exp1_controlled.pdf}
+\caption{Experiment 1 (controlled re-run). Forgetting drop $\Delta_A$ on
+Task~A per arm under the ideal (left) and Heron~r2 (right) noise
+profiles. The four cells of the $2{\times}2$ design are shown in red
+(scratch initialisation) and blue (synthetic prior); the
+continual-learning baselines are shown in green. Bars show the mean over
+twenty seeds with 95\% bootstrap confidence intervals and markers show
+the per-seed values. Lower is better.}
+\label{fig:exp1_controlled}
+\end{figure}
+
+\input{tables/tab_exp1_controlled.tex}
+\input{tables/tab_exp1_contrasts.tex}
+\input{tables/tab_exp1_baselines.tex}
+
+Table~\ref{tab:exp1_contrasts} decomposes the headline reduction of
+Table~\ref{tab:exp1} into its two factors. The learning-rate regime
+carries most of the effect: at matched initialisation, the gentler pair
+reduces the drop by $5.21$ points from the scratch initialisation
+(bootstrap interval $[2.95, 7.51]$ for the reduction,
+$p_{\text{Holm}} < 0.001$, $d_z = -0.69$) and by $5.05$ points from the
+synthetic prior ($p_{\text{Holm}} < 0.001$, $d_z = -0.85$) in the pooled
+analysis of the forty seed pairs. The initialisation effect observed at
+matched rates is small and does not separate from zero: reductions of
+$1.19$ points at the single rate ($p_{\text{Holm}} = 0.309$) and $1.02$
+points at the gentle pair ($p_{\text{Holm}} = 0.345$), with the same
+reading under each noise profile taken separately. The headline
+contrast between the pre-trained arm of the conference protocol and its
+scratch reference, $6.24$ points with $p_{\text{Holm}} < 0.001$ and
+$d_z = -1.10$, is therefore compatible with an effect of the
+optimisation regime rather than of the prior, and the cross contrast
+reinforces this reading: the synthetic arm trained at the single rate
+forgets $4.03$ points more than the scratch arm trained at the gentle
+pair ($p_{\text{Holm}} = 0.004$), so the regime dominates the
+initialisation even when the two factors are pitted against each other.
+
+Table~\ref{tab:exp1_baselines} places the synthetic prior against the
+continual-learning baselines, and on retention the contrast is not
+favourable to the prior. Relative to the plain scratch arm, the mildest
+consolidation reduces forgetting by $9.47$ points and the replay-based
+methods by $58.19$ (replay) and $66.49$ points (Dark Experience
+Replay++), with $p_{\text{Holm}} < 0.001$ for every contrast and
+$|d_z|$ between $1.03$ and $16.79$, while the synthetic-prior arm
+forgets $3.24$ points more than the mildest consolidation
+($p_{\text{Holm}} = 0.023$) and between $52$ and $60$ points more than
+the replay-based methods. These reductions are bought with plasticity
+rather than obtained for free. The strictest consolidation essentially
+blocks the second task: it ends the Task~B phase with $91.08$ to $93.30$
+points on Task~A but only $31.55$ to $34.12$ points on Task~B, against
+the $87.8$ to $90.4$ points reached by the plain and synthetic arms.
+Replay and Dark Experience Replay++ occupy intermediate positions on
+Task~B ($73.15$ and $61.12$ points under the ideal profile), so the
+table describes a stability--plasticity frontier rather than a ranking
+on $\Delta_A$ alone.
+
+The controlled evidence therefore narrows the claim that the conference
+version attached to Table~\ref{tab:exp1}: at this scale and with
+matched rates, the cross-domain prior contributes a small and
+non-significant reduction of forgetting under both noise conditions,
+the regime of the sequential phases contributes a significant one, and
+the regularisation and rehearsal baselines absent from the conference
+version dominate retention at the explicit price of Task~B plasticity.
 
 \subsection{Experiment 2: topology capacity and retention}
 

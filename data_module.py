@@ -10,13 +10,18 @@ import numpy as np
 
 class DataModule:
     """
-    Data module to handle Synthetic datasets, MNIST, Fashion-MNIST, and CIFAR-10 (via MobileNetV2).
-    Filters binary classes, standardizes, applies PCA reduction to 4 features,
-    and returns PyTorch DataLoaders.
+    Data module to handle Synthetic datasets, MNIST, Fashion-MNIST, KMNIST,
+    and CIFAR-10 (via MobileNetV2).
+
+    Filters binary classes, standardizes, applies PCA reduction to
+    `n_components` features (repair 3.7: it was hard-coded to 4, which
+    breaks any run with more than 4 qubits), and returns PyTorch DataLoaders.
     """
-    def __init__(self, data_dir='./data', batch_size=32):
+
+    def __init__(self, data_dir='./data', batch_size=32, n_components=4):
         self.data_dir = data_dir
         self.batch_size = batch_size
+        self.n_components = int(n_components)
         os.makedirs(data_dir, exist_ok=True)
         # MobileNet loaded lazily on first call to get_mobilenet_features_task
         self.mobilenet = None
@@ -29,7 +34,7 @@ class DataModule:
                 param.requires_grad = False
 
     def get_mobilenet_features_task(self, classes=(0, 1), n_samples=1000):
-        """Loads CIFAR-10, passes through MobileNetV2, then PCA to 4 features."""
+        """Loads CIFAR-10, passes through MobileNetV2, then PCA to n_components."""
         transform = transforms.Compose([
             transforms.Resize(224),
             transforms.ToTensor(),
@@ -38,7 +43,7 @@ class DataModule:
         self._ensure_mobilenet()
         train_set = torchvision.datasets.CIFAR10(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.CIFAR10(root=self.data_dir, train=False, download=True, transform=transform)
-        
+
         def extract_features(dataset, limit):
             features, labels = [], []
             count = 0
@@ -51,32 +56,33 @@ class DataModule:
                         count += 1
                         if count >= limit: break
             return np.array(features), np.array(labels)
-            
+
         print("Extracting MobileNetV2 features for CIFAR-10...")
         X_tr, y_tr = extract_features(train_set, n_samples)
         X_ts, y_ts = extract_features(test_set, int(n_samples*0.2))
-        
-        pca = PCA(n_components=4)
+
+        pca = PCA(n_components=self.n_components)
         X_tr_pca = pca.fit_transform(X_tr)
         X_ts_pca = pca.transform(X_ts)
-        
+
         # Normalize to [0, pi]
         X_tr_pca = (X_tr_pca - X_tr_pca.min(axis=0)) / (X_tr_pca.max(axis=0) - X_tr_pca.min(axis=0) + 1e-8) * np.pi
         X_ts_pca = (X_ts_pca - X_ts_pca.min(axis=0)) / (X_ts_pca.max(axis=0) - X_ts_pca.min(axis=0) + 1e-8) * np.pi
-        
+
         train_loader = DataLoader(TensorDataset(torch.tensor(X_tr_pca, dtype=torch.float32), torch.tensor(y_tr, dtype=torch.long)), batch_size=self.batch_size, shuffle=True)
         test_loader = DataLoader(TensorDataset(torch.tensor(X_ts_pca, dtype=torch.float32), torch.tensor(y_ts, dtype=torch.long)), batch_size=self.batch_size, shuffle=False)
         return train_loader, test_loader
 
-    def get_synthetic_task(self, n_samples=2000):
+    def get_synthetic_task(self, n_samples=2000, n_features=None):
         """Generates a synthetic dataset for the Source Domain."""
+        n_features = self.n_components if n_features is None else n_features
         X, y = make_classification(
-            n_samples=n_samples, n_features=4, n_informative=4, 
+            n_samples=n_samples, n_features=n_features, n_informative=n_features,
             n_redundant=0, n_classes=2, random_state=42
         )
         # Normalize to [0, pi] for Angle Embedding
         X = (X - X.min(axis=0)) / (X.max(axis=0) - X.min(axis=0)) * np.pi
-        
+
         train_size = int(0.8 * n_samples)
         X_train, X_test = X[:train_size], X[train_size:]
         y_train, y_test = y[:train_size], y[train_size:]
@@ -102,45 +108,49 @@ class DataModule:
                 count += 1
                 if count >= limit_samples:
                     break
-        
+
         X = np.array(X)
         y = np.array(y)
 
         if is_train and pca is None:
-            pca = PCA(n_components=4)
+            pca = PCA(n_components=min(self.n_components, X.shape[0], X.shape[1]))
             X_pca = pca.fit_transform(X)
         else:
             X_pca = pca.transform(X)
-        
+
         # Normalize to [0, pi] for Angle Embedding
         X_pca = (X_pca - X_pca.min(axis=0)) / (X_pca.max(axis=0) - X_pca.min(axis=0) + 1e-8) * np.pi
 
         return torch.tensor(X_pca, dtype=torch.float32), torch.tensor(y, dtype=torch.long), pca
+
+    def _task_from_dataset(self, train_set, test_set, classes, pca_model=None, limit_train=1000, limit_test=200):
+        X_train, y_train, trained_pca = self._process_dataset(
+            train_set, classes, pca=pca_model, is_train=(pca_model is None), limit_samples=limit_train)
+        X_test, y_test, _ = self._process_dataset(
+            test_set, classes, pca=trained_pca, is_train=False, limit_samples=limit_test)
+
+        train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=self.batch_size, shuffle=True)
+        test_loader = DataLoader(TensorDataset(X_test, y_test), batch_size=self.batch_size, shuffle=False)
+
+        return train_loader, test_loader, trained_pca
 
     def get_mnist_task(self, classes=(0, 1), pca_model=None):
         """Loads MNIST filtered to 2 classes."""
         transform = transforms.Compose([transforms.ToTensor()])
         train_set = torchvision.datasets.MNIST(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.MNIST(root=self.data_dir, train=False, download=True, transform=transform)
-
-        X_train, y_train, trained_pca = self._process_dataset(train_set, classes, pca=pca_model, is_train=(pca_model is None), limit_samples=1000)
-        X_test, y_test, _ = self._process_dataset(test_set, classes, pca=trained_pca, is_train=False, limit_samples=200)
-
-        train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=self.batch_size, shuffle=True)
-        test_loader = DataLoader(TensorDataset(X_test, y_test), batch_size=self.batch_size, shuffle=False)
-        
-        return train_loader, test_loader, trained_pca
+        return self._task_from_dataset(train_set, test_set, classes, pca_model)
 
     def get_fashion_mnist_task(self, classes=(0, 1), pca_model=None):
         """Loads Fashion-MNIST filtered to 2 classes."""
         transform = transforms.Compose([transforms.ToTensor()])
         train_set = torchvision.datasets.FashionMNIST(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.FashionMNIST(root=self.data_dir, train=False, download=True, transform=transform)
+        return self._task_from_dataset(train_set, test_set, classes, pca_model)
 
-        X_train, y_train, trained_pca = self._process_dataset(train_set, classes, pca=pca_model, is_train=(pca_model is None), limit_samples=1000)
-        X_test, y_test, _ = self._process_dataset(test_set, classes, pca=trained_pca, is_train=False, limit_samples=200)
-
-        train_loader = DataLoader(TensorDataset(X_train, y_train), batch_size=self.batch_size, shuffle=True)
-        test_loader = DataLoader(TensorDataset(X_test, y_test), batch_size=self.batch_size, shuffle=False)
-        
-        return train_loader, test_loader, trained_pca
+    def get_kmnist_task(self, classes=(0, 1), pca_model=None):
+        """Loads KMNIST filtered to 2 classes (repair 3.7: TIL-3 source, E2)."""
+        transform = transforms.Compose([transforms.ToTensor()])
+        train_set = torchvision.datasets.KMNIST(root=self.data_dir, train=True, download=True, transform=transform)
+        test_set = torchvision.datasets.KMNIST(root=self.data_dir, train=False, download=True, transform=transform)
+        return self._task_from_dataset(train_set, test_set, classes, pca_model)

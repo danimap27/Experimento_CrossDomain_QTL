@@ -73,7 +73,8 @@ class ExperimentRunner:
     def calculate_forgetting(self, initial_acc, final_acc):
         return initial_acc - final_acc
 
-    def run_experiment_1(self, model_class, source_loader, task_a_loader, task_b_loader):
+    def run_experiment_1(self, model_class, source_loader, task_a_loader, task_b_loader,
+                         freeze_layers=None):
         print("\n--- Running Experiment 1: Constraining CF via Pre-training (QTL) ---")
 
         print(">> Training Baseline (Random Initialization)")
@@ -82,25 +83,40 @@ class ExperimentRunner:
         acc_a_initial_base, _ = self.evaluate(baseline_model, task_a_loader[1])
         self.train_model(baseline_model, train_loader=task_b_loader[0])
         acc_a_final_base, _ = self.evaluate(baseline_model, task_a_loader[1])
+        acc_b_final_base, _ = self.evaluate(baseline_model, task_b_loader[1])
         drop_base = self.calculate_forgetting(acc_a_initial_base, acc_a_final_base)
 
         print("\n>> Training QTL (Pre-trained on Synthetic Domain)")
         qtl_model = self._make_model(model_class, ansatz='A', n_layers=3)
         self.train_model(qtl_model, train_loader=source_loader[0], epochs=15)
 
-        print("Fine-tuning QTL on Sequential Tasks with Frozen Prior")
-        for name, param in qtl_model.named_parameters():
-            if '0' in name:
-                param.requires_grad = False
+        # Audit A2 repair: the historical `if '0' in name` filter never matched
+        # any real parameter (vqc.weights / fc.weight / fc.bias) and silently
+        # froze nothing. The protocol dropped the freeze claim (checklist 1.4);
+        # the corrected functional freeze is opt-in via `freeze_layers` and is
+        # self-tested in self_tests.py (freeze/*).
+        if freeze_layers:
+            frozen = qtl_model.freeze_ansatz_layers(freeze_layers)
+            print(f"Fine-tuning QTL with FUNCTIONAL freeze on {frozen}")
+        else:
+            print("Fine-tuning QTL (no freeze -- claim dropped from the protocol)")
 
         self.train_model(qtl_model, train_loader=task_a_loader[0], override_lr=0.01)
         acc_a_initial_qtl, _ = self.evaluate(qtl_model, task_a_loader[1])
         self.train_model(qtl_model, train_loader=task_b_loader[0], override_lr=0.005)
         acc_a_final_qtl, _ = self.evaluate(qtl_model, task_a_loader[1])
+        acc_b_final_qtl, _ = self.evaluate(qtl_model, task_b_loader[1])
 
         drop_qtl = self.calculate_forgetting(acc_a_initial_qtl, acc_a_final_qtl)
 
-        return drop_base, drop_qtl
+        # Absolute accuracies persisted (audit A5 / reviewer R2.2d).
+        return {
+            "drop_base": drop_base, "drop_qtl": drop_qtl,
+            "acc_a_init_base": acc_a_initial_base, "acc_a_final_base": acc_a_final_base,
+            "acc_b_final_base": acc_b_final_base,
+            "acc_a_init_qtl": acc_a_initial_qtl, "acc_a_final_qtl": acc_a_final_qtl,
+            "acc_b_final_qtl": acc_b_final_qtl,
+        }
 
     def run_experiment_2(self, model_class, task_a_loader, task_b_loader):
         print("\n--- Running Experiment 2: Topology Susceptibility to Forgetting ---")

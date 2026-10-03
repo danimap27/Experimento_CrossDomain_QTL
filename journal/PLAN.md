@@ -358,3 +358,81 @@ Housekeeping notes from that packet that affect this plan:
 - The two audits should be treated as one workstream: this document is the
   working plan (repo, English), the packet is the review dossier and the
   artifact set (Spanish) for the team.
+
+## 11. Team directives (F. Martínez-Álvarez) on the QAI reviews (Sep 2026)
+
+Verbatim mapping of the team's decisions onto concrete changes. The left
+column is the reviewer point, the second the directive as given, the third the
+action taken in this plan.
+
+| Reviewer point | Directive (Paco) | Action |
+|---|---|---|
+| R2.1 novelty overclaimed | Soften the contribution | Keep the repositioning of draft v0.1 (empirical characterisation + mechanism, not a new method). Reinforce in the abstract and contributions. |
+| R2.2 evaluation too narrow | (a) adopt David's experimental protocol; (b) explain the metrics and their formulas theoretically in the fundamentals; (c) use rehearsal as the baseline | (a) Section 12; (b) expand the Background section with the formal derivation and justification of AA, AF, BWT, ΔA and the relative retention; (c) rehearsal becomes a first-class arm (Workstream A), EWC kept as the reviewer's requested regularisation arm. |
+| R2.3 scalability | Run on real hardware; once the real results exist, de-emphasise the classical-cost-dominates point | Workstream G moves from optional to **required** (a real-QPU validation block enters the campaign). The classical-cost note stays factual and secondary. |
+| R4 motivation | More narrative justifying the continual-learning study | Introduction rewrite with an explicit application narrative (streaming data on constrained quantum devices). |
+| R4 hypothesis rationale | Argue and think it through | Explicit rationale paragraph: why a synthetic prior should reshape the landscape, tied to the mechanism evidence. |
+| R4 limited CL coverage | More baselines or comparisons | Workstreams A and B: naive, rehearsal, EWC, DER++ reference, plus classical-head references under the identical protocol. |
+| R4 scenario too simple | More tasks | Workstream B: 5-task sequences (split-MNIST, split-Fashion-MNIST, split-CIFAR-10) and a 3-task chain on the four-qubit protocol. |
+
+## 12. Group experimental protocol (D. Gutiérrez-Avilés) — operational mapping
+
+The team's standard QML experimentation protocol (PROTOCOLO_EXPERIMENTACION_QML)
+applies to this paper as follows. Where the protocol gives ranges, the chosen
+value is fixed here so the coordinates are closed before launching.
+
+**Study type and research questions.** The study is a benchmark/application
+hybrid: statistics, ablation and reproducibility carry the weight, the novelty
+is the characterisation and its mechanism. The manuscript will state 3-5
+numbered RQs (to be written in draft v1.0) and every experiment block maps to
+one.
+
+**Coordinates [Dataset, Seed, Environment, Model].**
+
+- *Dataset.* Synthetic Gaussian source, Fashion-MNIST, MNIST and CIFAR-10
+  (MobileNetV2 features) as in the current pipeline, plus KMNIST for 3+ task
+  chains, plus the full-split variants (Workstream B). Difficulty range and
+  class balance documented per source.
+- *Seed.* Ten seeds, `{0, 1, 7, 42, 123, 456, 789, 1234, 2024, 3407}`, for
+  simulation and emulation. The reduced set `{0, 42, 123, 456, 789}` is a
+  declared fallback only for the real-QPU block if budget forces it. Seeds
+  fixed everywhere: NumPy, PyTorch, DataLoader order, circuit initialisation
+  and optimiser. `torch.use_deterministic_algorithms(True)` in `set_seed()`.
+  SPSA reproducibility verified explicitly and variance reported if not
+  reproducible.
+- *Environment.* Three regimes, reported together: simulated (state-vector,
+  exact), emulated (calibrated noise; 1024 shots where sampling applies) and
+  real (QPU validation block). Degradation across regimes is a headline
+  comparison.
+- *Model.* Each arm declares its full configuration (qubits, depth,
+  entanglement, gradient method, optimiser, epochs, rate, batch, regulariser)
+  and stays fixed across the main battery. Transpiled depth and gate counts
+  reported for the real-device circuits, with numbers, not prose.
+- *Compute.* Hercules (or Caléndula) for all classical/simulated/emulated
+  runs; the same compute resource across every arm of a timing comparison; QPU
+  comparisons expressed as qualitative degradation, never as a fair timing
+  ratio.
+
+**Statistics.** Two-way comparisons: Wilcoxon signed-rank over seeds +
+Holm-Bonferroni. More than two models: Friedman + post-hoc Nemenyi with a
+critical-difference diagram. At least five metrics: accuracy, macro-F1, AA,
+AF, BWT (the paired t-test and bootstrap intervals already in the repository
+remain as secondary descriptors).
+
+**Ablation.** Method-component ablation (source domain, freezing, LR schedule,
+readout configuration) and circuit grid qubits `{4, 8, 16}` x depth
+`{1, 3, 5}` where feasible, declaring which grid points run on which backend
+(density-matrix emulation caps the 16-qubit point).
+
+**Sensitivity and scalability.** Source size and learning rate as the two
+sweeps; training/inference time versus problem size; optimisation cost
+reported.
+
+**Complementary studies.** Barren plateaus: Var(dL/dtheta) versus qubits and
+depth, ideal and noisy (extends the existing probe D1, which already covers
+qubits 4-12 in the ideal regime). Channel-wise noise decomposition: prepared as
+an optional study, only if requested in review.
+
+**Real hardware.** One machine name fixed throughout the manuscript; the
+July-2026 plan referenced IBM devices, the final choice to be confirmed by the
+team before launch.
