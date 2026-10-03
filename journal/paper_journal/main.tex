@@ -1,6 +1,10 @@
 %% ======================================================================
 %% Journal version — Cross-Domain Synthetic Pre-Training in QCL
-%% Draft v0.1 (2026-09-18). Internal working copy, not for submission yet.
+%% Draft v0.2 (2026-10-03). Internal working copy, not for submission yet.
+%% v0.2: theoretical grounding of the metrics (Delta_A = AF = -BWT at T=2),
+%% explicit working hypothesis and rationale, Holm-corrected statistics
+%% (family = three noise profiles), reproduction-cost framing of the
+%% classical front-end (see 07-lista-cambios-pendientes.md, blocks 1-2 and 7).
 %%
 %% Status of data: five-seed campaign of the QAI version, statistically
 %% re-analysed and with the Experiment-2 mislabelling corrected. Sections
@@ -59,9 +63,9 @@ three noise profiles, from an ideal state-vector simulation to a legacy
 device-level error budget, support the analysis, and every comparison is
 reported with paired tests, effect sizes and bootstrap confidence intervals.
 The synthetic prior reduces the forgetting drop of the first task by 7.0 to
-9.3 percentage points across the noise profiles, an improvement that reaches
-the 0.05 significance level under the calibrated device profile and becomes
-unambiguous when the profiles are pooled. A corrected reading of the topology
+9.3 percentage points across the noise profiles, an improvement that is
+nominally significant under the calibrated device profile and becomes
+unambiguous when the fifteen seed pairs are pooled. A corrected reading of the topology
 comparison shows that the architectures with the largest capacity learn the
 first task best and also lose the most, while the most constrained
 architecture retains more only because it never learns the task well. A
@@ -299,6 +303,25 @@ relative retention $r_A = \mathrm{Acc}_A^{\text{final}} /
 \mathrm{Acc}_A^{\text{init}}$ is reported alongside $\Delta_A$, because the
 absolute drop alone rewards classifiers that never learned the first task.
 
+Two properties fix the role of $\Delta_A$ among these quantities. First, for
+a sequence of two tasks the peak accuracy of Task A is attained at the end of
+its own phase, so the average forgetting of Eq.~(\ref{eq:aa_af}) and the
+backward transfer of Eq.~(\ref{eq:bwt}) reduce to
+\begin{equation}
+  \Delta_A = \mathrm{AF} = -\mathrm{BWT} \qquad (T = 2),
+  \label{eq:delta_identity}
+\end{equation}
+and the three measures carry the same information at this sequence length;
+$\Delta_A$ is used because it is the quantity reported by the earlier
+conference version of this study, and it embeds directly into the
+$\mathrm{BWT}$ and $\mathrm{AF}$ definitions as the sequence grows. Second,
+$\Delta_A$ is bounded above by $\mathrm{Acc}_A^{\text{init}}$, so a
+classifier that never acquires Task A cannot lose much and exhibits a small
+drop for the wrong reason. The drop is therefore read jointly with
+$\mathrm{Acc}_A^{\text{init}}$ and $r_A$, and
+Section~\ref{sec:results} exhibits this failure mode in the topology
+comparison, where the least accurate architecture shows the smallest drop.
+
 % ======================================================================
 \section{Methodology}
 \label{sec:methodology}
@@ -329,6 +352,29 @@ design: a scratch model, initialised at random, and a cross-domain model
 whose source features come from CIFAR-10 images passed through the same
 MobileNetV2 backbone \cite{krizhevsky2009cifar}, which separates the effect
 of the synthetic source from the effect of pre-training on real images.
+
+\paragraph{Working hypothesis.} The study tests the hypothesis that
+pre-training a parameterised circuit on generic synthetic data yields a more
+favourable initialisation for subsequent sequential training than a random
+draw. Three arguments motivate the expectation. From the classical side,
+features learned on a source with no semantic relation to the target still
+transfer to it \cite{Yosinski14, pan2009survey}, so the benefit of
+pre-training need not depend on domain overlap. From the quantum side, the
+initialisation of a variational circuit is not neutral for its trainability:
+layerwise initialisation stabilises the training of small circuits
+\cite{Skolik21}, and random draws in wide circuits concentrate in flat
+regions of the landscape \cite{mcclean2018barren}. From the design side, an
+isotropic Gaussian source with full-rank covariance activates every rotation
+axis of the encoding layer, so the source optimisation moves the parameters
+through a region where the circuit responds to structured inputs, instead of
+leaving them near the small-angle regime of a canonical random draw. The
+hypothesis yields three testable predictions: the prior reduces the
+forgetting drop without raising the accuracy ceiling of the target task; the
+gradient signal of the target loss at the pre-trained point is stronger than
+at random points; and the benefit does not require semantic overlap between
+source and target. The first two are tested in
+Sections~\ref{sec:results} and~\ref{sec:mechanism}, and the third is probed
+by the cross-domain image reference of Experiment~3.
 
 \begin{algorithm}[ht]
 \small
@@ -509,7 +555,12 @@ Hercules cluster of the Centro de Inform\'atica Cient\'ifica de Andaluc\'ia,
 on standard nodes with four CPU cores and eight gigabytes of memory, as
 independent jobs of SLURM arrays. The complete five-seed campaign over the
 three noise profiles consists of forty-five sequential trainings per
-experiment.
+experiment. The classical front-end of the image sources, namely the
+MobileNetV2 feature extraction and the principal-component reduction, is
+accounted separately as the reproduction cost of the data preparation and
+not as part of the quantum training loop; the end-to-end balance of the
+pipeline returns in Section~\ref{sec:discussion}, where the scope of the
+claims is delimited.
 
 % ======================================================================
 \section{Results}
@@ -525,13 +576,18 @@ profile, the random initialisation loses $72.90 \pm 2.01$ points of Task A
 accuracy after the Task B phase, and the synthetic prior reduces the loss to
 $65.10 \pm 3.73$ points, a paired reduction of $7.80$ points whose bootstrap
 interval $[4.50, 12.30]$ excludes zero and whose paired test arrives at
-$p = 0.028$. The ideal profile shows a reduction of $7.00$ points with a
+$p = 0.028$, which becomes $p_{\text{Holm}} = 0.084$ when the three
+per-profile tests are corrected as one family. The ideal profile shows a reduction of $7.00$ points with a
 wider interval, and the legacy profile shows the largest nominal reduction,
 $9.30$ points, with the widest spread, which reflects the larger seed
 variance of the noisiest condition. When the fifteen seed pairs of the three
 profiles are pooled, the reduction is $8.03$ points with a bootstrap interval
 of $[4.47, 11.63]$, a paired test below $0.001$, a signed-rank test at
-$0.003$ and an effect size of $d_z = 1.09$.
+$0.003$ and an effect size of $d_z = 1.09$. Read profile by profile, the
+device contrast is nominally significant but does not survive the
+family-wise correction over the three noise profiles, so the confirmatory
+evidence for the sign of the effect is the pooled analysis, and the
+per-profile values delineate its robustness across noise conditions.
 
 \begin{figure}[ht]
 \centering
@@ -575,8 +631,9 @@ topology appears the most stable in relative terms while being the weakest
 in absolute terms, since it never expresses the first task well enough to
 have much to lose. The paired tests resolve the contrast between the basic
 entangler and each of the other two topologies below the $0.001$ level after
-Holm correction, while the contrast between SEL and TTN does not reach the
-$0.05$ level under any profile. The comparison across topologies is thus a
+Holm correction ($p_{\text{Holm}} < 2 \times 10^{-4}$ under every profile),
+while the contrast between SEL and TTN does not reach the $0.05$ level under
+any profile. The comparison across topologies is thus a
 comparison across effective capacities, which is consistent with the
 structural analysis of the readout noted in Section~\ref{sec:methodology}.
 
@@ -694,8 +751,9 @@ learning-rate control repeats the first experiment with matched schedules
 and adds an elastic-weight-consolidation arm and a rehearsal arm under the
 same protocol, which separates the contributions of initialisation,
 regularisation and memory. The scenario axis extends the evaluation to
-class-incremental sequences and to longer task chains over split variants of
-MNIST, Fashion-MNIST and CIFAR-10. The scale axis sweeps qubit counts and
+class-incremental sequences, the standard setting of the classical
+continual-learning benchmarks, and to longer task chains over the split
+variants of MNIST, Fashion-MNIST and CIFAR-10 used by that community. The scale axis sweeps qubit counts and
 circuit depths with a resource accounting of gate counts and depth. The
 mechanism axis completes the landscape characterisation with curvature and
 task-gradient alignment measurements. A hardware validation of the
@@ -710,8 +768,8 @@ memory-free initialisation for sequential quantum classifiers. Under a
 four-qubit hybrid model and a three-profile noise budget, the synthetic
 prior reduces the forgetting drop of the first task by seven to nine
 percentage points relative to a random initialisation, with the effect
-resolved at the 0.05 level under the device profile and below 0.001 when the
-profiles are pooled. The corrected reading of the topology comparison shows
+nominally significant under the device profile and below 0.001 when the
+fifteen seed pairs are pooled. The corrected reading of the topology comparison shows
 that the apparent retention advantage of the constrained topology reflects
 its inability to learn the first task, and that the two high-capacity
 topologies forget nearly the entire first-task accuracy. The mechanism
