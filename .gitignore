@@ -22,3 +22,7 @@ run_noisy_5seeds.log
 .venv/
 venv/
 .DS_Store
+
+# figures needed to build the reconstructed/manuscript LaTeX
+!paperQAI/figures/*.png
+!journal/paper_journal/figures/*.pdf
