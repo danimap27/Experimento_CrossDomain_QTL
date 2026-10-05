@@ -9,7 +9,7 @@
 #SBATCH --error=logs/slurm/e234_%A_%a.err
 
 cd "$HOME/crossdomain_qcl" || exit 1
-source "$HOME/envs/qcl/bin/activate"
+export PATH="$HOME/envs/qcl/bin:$PATH"
 export OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1
 
 ARGS=$(sed -n "${SLURM_ARRAY_TASK_ID}p" cmds_e234.txt)

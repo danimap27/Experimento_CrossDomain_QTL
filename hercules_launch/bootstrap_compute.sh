@@ -6,19 +6,24 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=8G
 #SBATCH --time=01:30:00
-#SBATCH --output=/lustre/home/dmartin/crossdomain_qcl/bootstrap4_%j.out
-#SBATCH --error=/lustre/home/dmartin/crossdomain_qcl/bootstrap4_%j.err
+#SBATCH --output=/lustre/home/dmartin/crossdomain_qcl/bootstrap5_%j.out
+#SBATCH --error=/lustre/home/dmartin/crossdomain_qcl/bootstrap5_%j.err
 
-# Bootstrap E2/E3/E4 en un NODO DE COMPUTO (login node tiene /lustre noexec).
+# Bootstrap E2/E3/E4 v5 — conda-forge (evita el ToS de los canales de Anaconda).
 set -ex
 cd "$HOME/crossdomain_qcl"
 echo "== host: $(hostname) | $(date) =="
 
-rm -rf "$HOME/miniconda3"
-bash "$HOME/miniconda.sh" -b -p "$HOME/miniconda3"
+if [ ! -x "$HOME/miniconda3/bin/conda" ]; then
+  rm -rf "$HOME/miniconda3"
+  bash "$HOME/miniconda.sh" -b -p "$HOME/miniconda3"
+fi
 "$HOME/miniconda3/bin/conda" --version
 
-"$HOME/miniconda3/bin/conda" create -y -p "$HOME/envs/qcl" python=3.11
+"$HOME/miniconda3/bin/conda" create -y -p "$HOME/envs/qcl" python=3.11 \
+  --override-channels --channel conda-forge
+"$HOME/envs/qcl/bin/python" --version
+
 "$HOME/envs/qcl/bin/pip" install "pennylane==0.44.1" torch torchvision numpy scikit-learn matplotlib
 
 "$HOME/envs/qcl/bin/python" - <<'PYEOF'
@@ -35,4 +40,4 @@ PYEOF
 mkdir -p logs/slurm
 echo "=== launching campaign array ==="
 sbatch slurm_e234c.sh
-echo "BOOTSTRAP4 DONE $(date)"
+echo "BOOTSTRAP5 DONE $(date)"
