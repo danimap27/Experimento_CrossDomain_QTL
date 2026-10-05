@@ -178,7 +178,7 @@ with ten seeds per arm and the synthetic prior sharing the E1 pre-training
 checkpoint protocol.
 
 Table~\\ref{{tab:e234_chain4}} reports the chain. Under the ideal profile the
-four-task class-IL accuracy is {fmt(sc42)} $\\pm$ points for the scratch arm
+four-task class-IL accuracy is {fmt(sc42)} points for the scratch arm
 against {fmt(sy42)} for the synthetic prior (pooled over both noise profiles
 {fmt(sc4)} vs\\ {fmt(sy4)}; paired difference
 {c4.get('mean_delta', 0):+.2f} points, $p_{{\\text{{Holm}}}}$ = {pstr(c4.get('p_holm'))},
@@ -187,9 +187,10 @@ TIL-2 {fmt(st2)} vs\\ {fmt(sy2)}, CIL-2 {fmt(sc2c)} vs\\ {fmt(sy2c)},
 TIL-3 {fmt(st3)} vs\\ {fmt(sy3)}, CIL-3 {fmt(sc3c)} vs\\ {fmt(sy3c)}, with
 every Holm-corrected contrast inside the pre-declared family of five
 scenario metrics staying above the 0.05 level. The class-incremental
-reading is markedly harder than the oracle reading --- mean accuracies fall
-from the nineties on the freshly trained task to the forties and below on
-the earlier ones (Figure~\\ref{{fig:e234_scenarios}}) --- and, at this
+reading is markedly harder than the oracle reading --- accuracies on the
+freshly trained task stay around ninety, while the earlier ones collapse
+to single digits, mostly to near zero (Figure~\\ref{{fig:e234_scenarios}}) ---
+and, at this
 scale, the synthetic prior neither attenuates nor aggravates the loss in
 either regime. Under the Heron~r2 profile the four-task accuracy is
 {fmt(sch)} against {fmt(syh)} (paired difference
@@ -224,8 +225,10 @@ $\\chi^2$ = {fmt(fchi)} ($p$ = {pstr(fp)}) with mean ranks
 scratch {fmt(franks.get('scratch'))}, synth {fmt(franks.get('synth'))},
 rehearsal {fmt(franks.get('er'))}, EWC {fmt(franks.get('ewc'))} and a
 Nemenyi critical difference of {fmt(fcd)} at $\\alpha=0.05$
-\\cite{{demsar2006statistical}}; no pair separates beyond the critical
-difference. Under the Heron~r2 profile split-MNIST gives
+\\cite{{demsar2006statistical}}; the rehearsal arm separates from scratch and
+EWC beyond the critical difference, while the synthetic prior remains
+statistically indistinguishable from scratch. Under the Heron~r2 profile
+split-MNIST gives
 {fmt(aa_sch)} against {fmt(aa_sfh)} points
 ({pstr(csync_h.get('p_holm'))}), and split-Fashion-MNIST
 {fmt(aa_f_sc)} against {fmt(aa_f_sy)} ({pstr(csync_f.get('p_holm'))});
@@ -282,9 +285,17 @@ synth$-$scratch contrasts are
 {c2.get('mean_delta', 0):+.2f} ({pstr(c2.get('p_holm'))}) and
 {c12.get('mean_delta', 0):+.2f} ({pstr(c12.get('p_holm'))}) points
 (cf. Figure~\\ref{{fig:e234_scale}}). Two readings survive the numbers:
-accuracy improves sharply from 500 to 2\\,000 samples and then mostly
-saturates, so the deficit of the conference protocol was driven by the
-reduced budget rather than by the model; and the forgetting drop does not
+the shared-readout accuracy drops sharply from the 500-sample budget to
+the 2\\,000-sample budget and then plateaus, and the drop is carried
+entirely by Task-A retention --- both tasks are still learned to the same
+level at every budget (freshly trained accuracies between 91 and 97
+points) while the Task-A drop grows from
+{fmt(d5.get('scratch', {}).get('delta_a_cil'), 1)} points at 500 samples to
+{fmt(d2.get('scratch', {}).get('delta_a_cil'), 1)} and
+{fmt(d12.get('scratch', {}).get('delta_a_cil'), 1)} at 2\\,000 and 12\\,000
+(scratch arm), so the small budget of
+the conference protocol understated the interference between the two
+tasks rather than limiting the model; and the forgetting drop does not
 separate the arms at any budget, i.e.\\ the null result of the controlled
 re-run is not an artefact of the small data subset. Under the Heron~r2
 profile the full split gives {fmt(a12hs)} / {fmt(a12hy)} points
@@ -485,7 +496,7 @@ def appendix_block():
     recs = {(x["n_qubits"], x["n_layers"]): x for x in r["records"]}
     a = recs[(4, 3)]
     b = recs[(8, 3)]
-    c = recs[(12, 3)]
+    c = recs[(12, 4)]
     return f"""
 \\appendix
 \\section{{Circuit resources and fault-tolerant estimate}}
@@ -599,14 +610,15 @@ def main():
     log(f"array complete={complete}")
     if not sync():
         log("rsync FAILED"); sys.exit(1)
-    py("analysis/e234_stats.py")
-    py("analysis/e234_figures.py")
-    py("analysis/e234_stats_crosscheck.py")
+    rcs = [py("analysis/e234_stats.py").returncode,
+           py("analysis/e234_figures.py").returncode,
+           py("analysis/e234_stats_crosscheck.py").returncode]
     S = load_json("e234_stats.json")
     c = S["completeness"]
-    log(f"completeness: {c}")
+    log(f"completeness: {c} step rcs: {rcs}")
     gate = (c.get("missing", 1) == 0 and c.get("incomplete", 1) == 0
-            and c.get("stale_local_labels", 1) == 0)
+            and c.get("stale_local_labels", 1) == 0
+            and all(rc == 0 for rc in rcs))
     if not gate:
         log("completeness gate FAILED -- main.tex left untouched; rerun this "
             "script after the campaign is complete (missing/incomplete/stale)")

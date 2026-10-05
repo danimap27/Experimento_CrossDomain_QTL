@@ -802,7 +802,7 @@ with ten seeds per arm and the synthetic prior sharing the E1 pre-training
 checkpoint protocol.
 
 Table~\ref{tab:e234_chain4} reports the chain. Under the ideal profile the
-four-task class-IL accuracy is 24.90 $\pm$ points for the scratch arm
+four-task class-IL accuracy is 24.90 points for the scratch arm
 against 24.93 for the synthetic prior (pooled over both noise profiles
 24.91 vs\ 24.84; paired difference
 -0.07 points, $p_{\text{Holm}}$ = 0.537,
@@ -811,9 +811,10 @@ TIL-2 74.81 vs\ 74.40, CIL-2 44.94 vs\ 45.30,
 TIL-3 66.33 vs\ 63.65, CIL-3 27.83 vs\ 27.77, with
 every Holm-corrected contrast inside the pre-declared family of five
 scenario metrics staying above the 0.05 level. The class-incremental
-reading is markedly harder than the oracle reading --- mean accuracies fall
-from the nineties on the freshly trained task to the forties and below on
-the earlier ones (Figure~\ref{fig:e234_scenarios}) --- and, at this
+reading is markedly harder than the oracle reading --- accuracies on the
+freshly trained task stay around ninety, while the earlier ones collapse
+to single digits, mostly to near zero (Figure~\ref{fig:e234_scenarios}) ---
+and, at this
 scale, the synthetic prior neither attenuates nor aggravates the loss in
 either regime. Under the Heron~r2 profile the four-task accuracy is
 24.93 against 24.75 (paired difference
@@ -848,8 +849,10 @@ $\chi^2$ = 27.12 ($p$ = $<0.001$) with mean ranks
 scratch 2.40, synth 2.60,
 rehearsal 4.00, EWC 1.00 and a
 Nemenyi critical difference of 1.48 at $\alpha=0.05$
-\cite{demsar2006statistical}; no pair separates beyond the critical
-difference. Under the Heron~r2 profile split-MNIST gives
+\cite{demsar2006statistical}; the rehearsal arm separates from scratch and
+EWC beyond the critical difference, while the synthetic prior remains
+statistically indistinguishable from scratch. Under the Heron~r2 profile
+split-MNIST gives
 19.06 against 19.01 points
 (0.480), and split-Fashion-MNIST
 19.97 against 20.57 (0.204);
@@ -891,9 +894,14 @@ synth$-$scratch contrasts are
 +0.61 (0.356) and
 -1.71 (0.136) points
 (cf. Figure~\ref{fig:e234_scale}). Two readings survive the numbers:
-accuracy improves sharply from 500 to 2\,000 samples and then mostly
-saturates, so the deficit of the conference protocol was driven by the
-reduced budget rather than by the model; and the forgetting drop does not
+the shared-readout accuracy drops sharply from the 500-sample budget to
+the 2\,000-sample budget and then plateaus, and the drop is carried
+entirely by Task-A retention --- both tasks are still learned to the same
+level at every budget (freshly trained accuracies between 91 and 97
+points) while the Task-A drop grows from 16.2 points at 500 samples to
+64.9 and 60.2 at 2\,000 and 12\,000 (scratch arm), so the small budget of
+the conference protocol understated the interference between the two
+tasks rather than limiting the model; and the forgetting drop does not
 separate the arms at any budget, i.e.\ the null result of the controlled
 re-run is not an artefact of the small data subset. Under the Heron~r2
 profile the full split gives 62.32 / 62.11 points
@@ -1141,7 +1149,7 @@ therefore conservative at the gate level; it excludes state preparation,
 measurement, and error-correction overheads, and it is reported as an
 order-of-magnitude reality check on what the demonstrated scale implies for
 the fault-tolerant era, not as a compilation study. At twelve qubits and
-four layers the same accounting reaches 7175
+four layers the same accounting reaches 9328
 $T$ gates per inference, which is the quantitative form of the
 resource-awareness argument in the introduction.
 

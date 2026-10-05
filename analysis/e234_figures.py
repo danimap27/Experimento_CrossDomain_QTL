@@ -163,7 +163,7 @@ def fig_bench5(runs: Runs):
         series["af"].append(af)
     w = 0.38
     for k, (color, lab) in enumerate([("aa", "AA"), ("af", "AF")]):
-        vals = series[k]
+        vals = series[color]
         m = np.array([np.mean(v) for v in vals])
         s = np.array([np.std(v, ddof=1) for v in vals])
         ax.bar(xs + (k - 0.5) * w, m, yerr=s, width=w * 0.9, capsize=2,
