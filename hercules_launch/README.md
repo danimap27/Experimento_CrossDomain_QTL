@@ -1,43 +1,43 @@
-# hercules_launch — lanzamiento de la campaña E2/E3/E4 en Hércules
+# hercules_launch — Campaña E2/E3/E4 en Hércules
 
-> Preparado el 5-oct-2026 tras la sesión de despliegue. El MSI de Dani se apagó
-> a mitad del lanzamiento; **no quedó nada corriendo en Hércules** (el único
-> array enviado llevaba un entorno roto y fue cancelado) y todo está listo para
-> relanzar con un solo comando.
+> Actualizado 5-oct-2026: **la VPN del CICA vive ahora en el NAS** (openfortivpn,
+> servicio `hercules-vpn`) → el lanzamiento va **directo desde el NAS** con
+> `ssh hercules-cica`. El MSI ya no es necesario.
 
-## Relanzar (cuando el MSI esté encendido con la VPN del CICA activa)
+## Relanzar el despliegue
 
 ```bash
 bash launch_all.sh
 ```
 
-Eso hace, en orden: comprobar la vía → subir los scripts → lanzar el bootstrap
-v3 con `nohup` (sigue aunque se apague el MSI) → mostrar estado. Después, solo,
-sin más interacción:
-
-1. Instala Miniconda en `$HOME/miniconda3` (el Miniconda del módulo del sistema
-   no es usable: FS sin exec → `Permission denied`).
-2. Crea el entorno `$HOME/envs/qcl` (python 3.11).
-3. `pip install pennylane==0.44.1 torch torchvision numpy scikit-learn matplotlib`.
-4. Descarga datasets a `./data` (MNIST, FashionMNIST, KMNIST, CIFAR-10).
-5. Envía el **array SLURM de 290 celdas** (`slurm_e234c.sh` → `cmds_e234.txt`):
-   chain4 (TIL/CIL), smnist5/sfmnist5 (class-IL), pair2 escala {500,2k,12k},
-   qubits {4,6,8} × layers {2,3,4}, perfiles ideal + heron_r2.
+Sube los scripts, lanza el job `bootstrap` (en un nodo de CÓMPUTO) que hace:
+miniconda en `$HOME/miniconda3` → entorno `$HOME/envs/qcl` (py3.11) →
+pip (pennylane/torch/...) → datasets → **array SLURM de 290 celdas**.
 
 ## Monitorizar
 
 ```bash
-ssh dani@100.95.88.12 'ssh hercules "tail -20 ~/crossdomain_qcl/bootstrap3.log; squeue -u dmartin | head"'
+ssh hercules-cica 'squeue -u dmartin | head; tail -5 ~/crossdomain_qcl/bootstrap4_*.out'
+ssh hercules-cica 'ls ~/crossdomain_qcl/results/ | grep -c e234'   # celdas completadas
 ```
 
-## Qué hay ya desplegado en Hércules (`~/crossdomain_qcl`)
+## Hallazgos operativos del clúster (importantes)
 
-- Repo completo (código E1 + `e234_runner.py` + `self_tests.py` + `core/`).
-- `cmds_e234.txt` (290 celdas), `slurm_e234.sh`, `bootstrap_hercules.sh` (v1, roto),
-  `bootstrap_hercules_v2.sh` (v2, roto), `slurm_e234b.sh`.
+1. **`/lustre` está montado `noexec` en los nodos de LOGIN.** Cualquier binario
+   en `$HOME` (o módulos como Miniconda3) falla ahí con `Permission denied`.
+   Toda instalación/ejecución debe ir por `sbatch`/`salloc` (los nodos de
+   cómputo tienen exec **y** red). El bootstrap por eso es un job de cómputo.
+2. El Miniconda del módulo del sistema solo es usable en cómputo; aun así,
+   instalamos el nuestro en `$HOME/miniconda3` para tener control total.
+3. La VPN del CICA (Fortinet, `bardo.cica.es:443`) corre en el NAS:
+   `sudo hercules-vpn {start|stop|restart|status|log}` (sin password).
+4. `~/.ssh/config` del NAS: alias `hercules-cica` (login.spc.cica.es, dmartin,
+   clave `hercules_nas` autorizada en el clúster).
 
-## Pendiente menor
+## Contenido
 
-- `scifar5` (split-CIFAR-10) excluido de la lista: se lanzará si el equipo
-  confirma CIFAR en la batería principal (y tras `--extract-cifar`).
-- E5 (mecanismo) es un lanzamiento aparte, mismo patrón.
+- `launch_all.sh` — relanzador completo (acceso → subida → bootstrap → estado).
+- `bootstrap_compute.sh` — job SLURM que instala todo y envía el array.
+- `slurm_e234c.sh` — plantilla del array (290 celdas, %48 concurrentes).
+- `cmds_e234.txt` — lista de celdas (chain4 + smnist5/sfmnist5 + pair2 escalas
+  + qubits×layers; ideal + heron_r2; sin scifar5 → pendiente decisión CIFAR).
