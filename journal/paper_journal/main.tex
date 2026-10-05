@@ -782,32 +782,272 @@ deviation.}
 
 \input{tables/tab_exp3.tex}
 
+% ---- E2-E5 integrated (auto) ----
+
+\subsection{Scenario axis: task-IL and class-IL benchmarks}
+\label{sec:exp_scenarios}
+
+The scenario axis of the extended protocol asks whether the cross-domain prior
+behaves differently when the evaluation stops assuming a per-task readout.
+All runs of this axis train the shared multi-class head with globally
+offset labels and a single output layer, following the class-incremental
+protocol of van de Ven and Tolias \cite{Ven22}: at test time no task
+identity is available and the prediction is the argmax over the classes seen
+so far, while the task-incremental companion restricts the argmax to the
+task's own pair of classes as an oracle. A single four-task chain
+(Fashion-MNIST$\{0,1\}$ $\to$ MNIST$\{2,3\}$ $\to$
+KMNIST$\{4,5\}$ $\to$ Fashion-MNIST$\{8,9\}$) therefore yields
+TIL-2, CIL-2, TIL-3, CIL-3 and CIL-4 from the same sequential training,
+with ten seeds per arm and the synthetic prior sharing the E1 pre-training
+checkpoint protocol.
+
+Table~\ref{tab:e234_chain4} reports the chain. Under the ideal profile the
+four-task class-IL accuracy is 24.90 $\pm$ points for the scratch arm
+against 24.93 for the synthetic prior (pooled over both noise profiles
+24.91 vs\ 24.84; paired difference
+-0.07 points, $p_{\text{Holm}}$ = 0.537,
+$d_z$ = -0.14), and the shorter prefixes behave the same way:
+TIL-2 74.81 vs\ 74.40, CIL-2 44.94 vs\ 45.30,
+TIL-3 66.33 vs\ 63.65, CIL-3 27.83 vs\ 27.77, with
+every Holm-corrected contrast inside the pre-declared family of five
+scenario metrics staying above the 0.05 level. The class-incremental
+reading is markedly harder than the oracle reading --- mean accuracies fall
+from the nineties on the freshly trained task to the forties and below on
+the earlier ones (Figure~\ref{fig:e234_scenarios}) --- and, at this
+scale, the synthetic prior neither attenuates nor aggravates the loss in
+either regime. Under the Heron~r2 profile the four-task accuracy is
+24.93 against 24.75 (paired difference
+-0.17, $p_{\text{Holm}}$ = 0.242),
+so the null reading is stable across noise conditions.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e234_scenarios.pdf}
+\caption{E2 scenario axis. Top: task-IL and class-IL accuracies at the
+two-, three- and four-task prefixes of the chain for the scratch and
+synthetic-prior arms ($n=10$ seeds, bars with 95\% bootstrap intervals).
+Bottom: mean class-IL accuracy matrices after each phase (ideal profile);
+the upper triangle is not evaluated.}\label{fig:e234_scenarios}
+\end{figure}
+
+\input{tables/tab_e234_chain4.tex}
+
+The community-standard five-task benchmarks behave in the same direction.
+On split-MNIST (5 tasks $\times$ 2 classes, shared head) the average
+class-IL accuracy over the sequence is 18.97 points for the scratch
+arm and 19.02 for the synthetic prior
+($\delta$ = +0.05,
+$p_{\text{Holm}}$ = 0.240, $d_z$ = 0.40),
+with average forgetting 77.42 against 77.44 points; the
+regularisation and rehearsal arms land at 17.26 (EWC) and
+34.45 (rehearsal) mean accuracy, with
+$\delta$ = +15.49 ($<0.001$) and
+-1.71 ($<0.001$) against
+scratch. A Friedman test over the four arms (10 seeds, ideal profile) gives
+$\chi^2$ = 27.12 ($p$ = $<0.001$) with mean ranks
+scratch 2.40, synth 2.60,
+rehearsal 4.00, EWC 1.00 and a
+Nemenyi critical difference of 1.48 at $\alpha=0.05$
+\cite{demsar2006statistical}; no pair separates beyond the critical
+difference. Under the Heron~r2 profile split-MNIST gives
+19.06 against 19.01 points
+(0.480), and split-Fashion-MNIST
+19.97 against 20.57 (0.204);
+Table~\ref{tab:e234_bench5} collects the four AA/AF/BWT/FWT metrics per
+arm and Figure~\ref{fig:e234_bench5} the retention of the first task
+along the five phases. The standard class-incremental benchmarks therefore
+do not reproduce the retention advantage that the two-task protocol of
+Experiment~1 attributes to the synthetic prior: the prior remains a
+neutral initialisation at this scale, and the arms that explicitly trade
+plasticity for retention are the only ones that move the retention
+metrics, in the direction and at the plasticity cost already quantified
+in Table~\ref{tab:exp1_baselines}.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e234_bench5.pdf}
+\caption{E2 class-incremental benchmarks. (a) Retention of the first task
+along the five phases of split-MNIST for the four arms; (b) AA and AF per
+arm; (c) retention of the first task for split-Fashion-MNIST. Means over
+ten seeds with one standard-deviation bands.}\label{fig:e234_bench5}
+\end{figure}
+
+\input{tables/tab_e234_bench5.tex}
+
+
+\subsection{Data scale: full binary splits and the sample-size curve}
+\label{sec:exp_scale}
+
+The data-scale axis re-runs the two-task binary protocol of Experiment~1 on
+the full class splits and on two reduced sample budgets, separating
+"small model" from "small data". Table~\ref{tab:e234_scale} reports the
+per-seed means for {500}, {2\,000} and {12\,000} training samples per
+task using the shared binary readout of the two-task protocol: the mean
+accuracy over the two tasks is 85.70 / 85.72 points at 500
+(scratch / synthetic prior), 62.19 / 62.79 at 2\,000 and
+63.75 / 62.04 at the full split, and the paired
+synth$-$scratch contrasts are
++0.02 (0.968),
++0.61 (0.356) and
+-1.71 (0.136) points
+(cf. Figure~\ref{fig:e234_scale}). Two readings survive the numbers:
+accuracy improves sharply from 500 to 2\,000 samples and then mostly
+saturates, so the deficit of the conference protocol was driven by the
+reduced budget rather than by the model; and the forgetting drop does not
+separate the arms at any budget, i.e.\ the null result of the controlled
+re-run is not an artefact of the small data subset. Under the Heron~r2
+profile the full split gives 62.32 / 62.11 points
+(0.825).
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e234_scale.pdf}
+\caption{E3 data scale. (a) Mean accuracy over the two tasks of the shared
+binary readout; (b) Task-A forgetting drop; (c) Task-B accuracy, as a
+function of training samples per task (ideal profile, means over ten seeds
+with one standard-deviation error bars).}\label{fig:e234_scale}
+\end{figure}
+
+\input{tables/tab_e234_scale.tex}
+
+
+\subsection{Scaling: qubits, depth and task count}
+\label{sec:exp_scaling}
+
+The scaling axis sweeps the circuit resources of the two-task protocol
+(Table~\ref{tab:e234_scaling}): qubit counts {4, 6, 8} with the PCA
+dimension matched to the number of qubits, and depths {2, 3, 4} at four
+qubits, ten seeds per cell. Across the grid the baseline four-qubit
+three-layer cell reaches a Task-A drop of
+68.30 /
+71.35 points (scratch / prior,
+ideal) and the paired synth$-$scratch contrasts remain inside noise in
+every configuration
+(4q/3L +3.05, 0.108;
+6q/3L -0.85, 0.585;
+8q/3L -0.55, 0.868;
+4q/2L -2.45, 0.334;
+4q/4L +0.00, 1.000).
+Adding qubits at fixed depth and changing depth at four qubits leave both
+the accuracy level and the forgetting profile within the seed spread
+(Figure~\ref{fig:e234_scaling}), while the per-epoch wall-clock grows
+by roughly a factor of 2.3
+from four to eight qubits at fixed depth, consistent with the
+state-vector simulation cost. The resource accounting of the same grid ---
+parameter counts, one- and two-qubit gate counts, depth, and a
+fault-tolerant $T$-count estimate --- is reported in
+Appendix~\ref{app:resources}; the task-count dimension of the scaling
+question comes from the scenario chain of Section~\ref{sec:exp_scenarios},
+where the same sequential runs are read at two, three and four tasks. The
+combined reading is that within the simulated range the synthetic prior
+gives no measurable advantage in any corner of the grid, and the
+cross-domain effect reported for the conference protocol is specific to
+the two-task binary setting rather than a generic property of the method.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e234_scaling.pdf}
+\caption{E4 scaling grid (ideal profile, ten seeds). (a) Task-A forgetting
+drop and (b) mean accuracy for the five configurations; (c) mean wall-clock
+per epoch on one CPU core.}\label{fig:e234_scaling}
+\end{figure}
+
+\input{tables/tab_e234_scaling.tex}
+
+
+
+
 \subsection{Mechanism analysis}
 \label{sec:mechanism}
 
-Two probes explore why the synthetic prior changes the sequential outcome.
-The first probe measures the variance of the cost gradient over random
-parameter draws for both topologies and for qubit counts from four to
-twelve, which is the barren-plateau proxy used in the trainability
-literature \cite{mcclean2018barren}. The variance of the strongly entangling
-topology falls by more than two orders of magnitude between four and twelve
-qubits, from $5.2\times10^{-3}$ to $1.2\times10^{-5}$, while the variance of
-the hierarchical topology falls much more slowly, from $6.8\times10^{-3}$ to
-$3.6\times10^{-4}$. At twelve qubits the hierarchical wiring retains about
-thirty times more gradient variance than the dense wiring, which quantifies
-the trainability advantage that the literature attributes to locally
-connected circuits \cite{pesah2021absence}. The second probe compares the
-Task A gradient of the hybrid model at the pre-trained parameters and at
-random initialisation. The gradient norm at the pre-trained point is $3.02$,
-against $0.35 \pm 0.16$ over ten random initialisations, an eight-fold
-difference in signal magnitude, and the dispersion of the per-coordinate
-gradients is two orders of magnitude larger at the pre-trained point. The
-pre-trained parameters also leave the canonical angle interval, with values
-between $-7.97$ and $7.46$ radians, which shows that the source optimisation
-drives the circuit into a regime that the standard small-angle picture does
-not describe. Both probes are preliminary, are limited to the four-qubit
-configuration for the gradient comparison, and are reported here to frame
-the mechanism experiments of the extended protocol.
+The mechanism section combines the exploratory gradient probes of the
+review packet with the four checkpoint-based measurements of the extended
+protocol: per-layer gradient variance, empirical Fisher spectra, the loss
+barrier between the two task optima, and the parameter distributions
+including angle wrapping. All measurements use first-order autograd or
+double-precision finite differences with an explicit self-test, never
+second-order autodiff through the PennyLane layer, whose unreliability in
+this stack was documented during the audit (caveat T1). The checkpoints
+were re-trained locally for ten seeds per arm with the exact two-task
+protocol of the campaign (four-qubit strongly entangling ansatz, matched
+rates).
+
+The gradient-variance probe of the review packet sweeps the barren-plateau
+proxy over qubit counts from four to twelve and both circuit topologies:
+the variance of the cost gradient decays from $5.2\times10^{-3}$ to
+$1.2\times10^{-5}$ for the strongly entangling ansatz between four and
+twelve qubits, while the hierarchical wiring decays far more gently, from
+$6.8\times10^{-3}$ to $3.6\times10^{-4}$, keeping about thirty times
+more gradient variance at twelve qubits
+\cite{mcclean2018barren,pesah2021absence}. The checkpoint measurements
+sharpen this into a per-layer statement at the initialisation the two arms
+actually use. At $\theta_0$, the pre-trained point, the per-layer gradient
+variance of the Task-A loss is
+2.80e+00, 3.67e+00
+and 2.09e+00 for the three ansatz layers
+(mean over layers 2.85e+00), against
+2.73e-03, 3.03e-03
+and 1.36e-03 at random initialisation
+(2.37e-03) --- a gap of three orders of magnitude,
+uniformly across the layers, which means the source optimisation lands the
+circuit in an active, high-gradient region of the landscape rather than the
+weak-gradient region that random rotation angles occupy
+(Figure~\ref{fig:e5}a). After each arm has learned the first task the two
+checkpoints collapse onto comparably weak gradients
+(6.18e-02 vs\ 1.71e-01), and by the end
+of the second task both models exhibit renewed large gradients on Task-A
+data (1.15e+00 vs\ 2.12e+00), the
+signature of the interference that the accuracy matrices quantify.
+
+The empirical Fisher spectrum at $\theta_0$ tells the same story in terms
+of curvature: the trace is 1.13e+00 at random
+initialisation against 1.27e+02 at the prior
+point, with a fuller spectrum (spectral entropy
+1.05 vs\ 1.43
+and effective rank 2.9 vs\ 4.2);
+the top eigenvalue carries about half of the trace in both cases
+(Figure~\ref{fig:e5}b). The interpolation between the two task optima
+is the measurement that does not separate the arms: the linear path from
+$\theta_A$ to $\theta_B$ shows no loss barrier on the newly learned task
+for either arm (barrier height +0.000 and
++0.000; the two task solutions are linearly
+connected in this parametrisation), and the parameter distance travelled
+is essentially identical
+($\|\theta_B-\theta_A\|/\sqrt{d} = 1.040$ vs\ 1.063$).
+Forgetting in this model is therefore not a barrier phenomenon between the
+two solutions; what separates the arms is where the optimisation starts
+relative to both of them (Figure~\ref{fig:e5}c).
+
+Finally, the parameter distributions close an open item of the preliminary
+analysis: the circuit is $2\pi$-periodic in each rotation angle, which was
+verified numerically --- wrapping the 36 angles of the pre-trained circuit
+reproduces the loss to floating-point precision
+(maximum $|\Delta\mathcal{L}|$ = 3.3e-06).
+Random initialisation covers exactly one period
+(uniform in $[0, 2\pi)$), while the source phase pushes some coordinates
+beyond it (raw range up to about 7.6
+radians); after wrapping, the effective distributions differ mainly in
+dispersion (standard deviation 1.74 for random
+initialisation against 2.01 for the prior, with
+42\% and
+52\% of the raw angles outside the
+canonical interval). The gradient and curvature evidence above is the part
+with decision weight; the distributional description documents the
+effective working point of the pre-trained circuit. Self-tests: the
+finite-difference check of the gradient path agrees at
+6e-08 relative error,
+and the two ways of computing the Fisher trace agree at
+2e-05.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e5_mechanism.pdf}
+\caption{Mechanism measurements (10 seeds per arm). (a) Per-layer gradient
+variance of the Task-A loss at $\theta_0$ (error bars: standard deviation
+over seeds); (b) mean empirical Fisher spectrum of the Task-A loss at
+$\theta_0$; (c) training losses along the linear interpolation between the
+two task optima (fixed 300-sample subsets).}\label{fig:e5}
+\end{figure}
 
 % ======================================================================
 \section{Discussion}
@@ -878,6 +1118,34 @@ The current evidence is limited to small circuits and short binary
 sequences, and the effect is moderate in absolute terms, which positions the
 synthetic prior as one component of a memory-free strategy rather than as a
 complete solution to forgetting in near-term quantum learning.
+
+
+\appendix
+\section{Circuit resources and fault-tolerant estimate}
+\label{app:resources}
+
+Table~\ref{tab:e4_resources} lists the gate-level resources of the trained
+ansatz for the qubit counts and depths of the scaling grid. Every rotation
+gate of the circuit is a general single-qubit rotation; under the standard
+synthesis cost model of Ross and Selinger \cite{ross2016optimal} an
+arbitrary $z$-rotation approximated to error $\varepsilon$ costs about
+$3\log_2(1/\varepsilon)$ $T$ gates, and no generic single-qubit gate can be
+synthesised below three $T$ gates \cite{bocharov2012resource}. At
+$\varepsilon=10^{-6}$ the estimate is about
+60 $T$ gates per rotation,
+i.e.\ about 2392 $T$ for the four-qubit
+three-layer circuit and 4784 $T$ at eight
+qubits; CNOTs are Clifford operations and contribute no $T$ gates. The
+estimate counts every Euler angle of each rotation gate separately and is
+therefore conservative at the gate level; it excludes state preparation,
+measurement, and error-correction overheads, and it is reported as an
+order-of-magnitude reality check on what the demonstrated scale implies for
+the fault-tolerant era, not as a compilation study. At twelve qubits and
+four layers the same accounting reaches 7175
+$T$ gates per inference, which is the quantitative form of the
+resource-awareness argument in the introduction.
+
+\input{tables/tab_e4_resources.tex}
 
 \section*{CRediT authorship contribution statement}
 

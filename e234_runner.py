@@ -25,6 +25,14 @@ Protocol (fixed for this campaign, consistent with the E1 controlled design):
     15 epochs, lr 0.05) per cell, identical to E1 (B3 protocol).
   * `er`   = rehearsal with a 25% accumulated reservoir of every past task.
   * `ewc`  = sequential Fisher penalties from every completed task (lam 1e4).
+  * `--label-mode global` remaps every task's labels to their global class
+    offset (2*i) BEFORE training/evaluation, so the shared multi-class head
+    allocates a distinct pair of output units per task: this is the true
+    task-IL/class-IL protocol for chain4/smnist5/sfmnist5. The default
+    `local` mode keeps the two local labels (a shared binary readout trained
+    sequentially on both tasks, the semantics of the E1 two-task protocol);
+    it is kept for the pair2 cells so the scale/scaling axes remain
+    comparable with Experiment 1.
   * Metrics after every task: full accuracy matrices for class-IL (argmax over
     classes seen so far), class-IL over the full head, and task-IL (argmax
     restricted to the task's classes), plus AA/AF/BWT/FWT (van de Ven 2022).
@@ -339,6 +347,16 @@ def run_cell(args) -> pathlib.Path | None:
         seq_info.append({"dataset": ds, "classes": list(classes), "offset": offsets[i],
                          "n_train": dataset_size(tr), "n_test": dataset_size(te)})
 
+    if args.label_mode == "global":
+        # DataModule emits LOCAL labels (classes.index -> 0/1); remap them to
+        # the global class offsets so the shared multi-class head allocates a
+        # distinct output pair per task (true task-IL / class-IL).
+        for i in range(T):
+            for ld in (loaders[i], tests[i]):
+                ds_ = ld.dataset
+                X_, y_ = ds_.tensors
+                ds_.tensors = (X_, y_ + 2 * i)
+
     model_kwargs = dict(ansatz="A", n_qubits=nq, n_layers=nl, n_classes=n_classes,
                         noise=noise, noise_params=noise_params)
     criterion = nn.CrossEntropyLoss()
@@ -363,6 +381,7 @@ def run_cell(args) -> pathlib.Path | None:
             "n_qubits": nq, "n_components": ncomp, "n_layers": nl, "ansatz": "A",
             "n_classes": n_classes, "limit_train": limit_train,
             "limit_test": limit_test, "arm": args.arm,
+            "label_mode": args.label_mode,
             "method": {"er": "rehearsal 25% accumulated"}.get(args.arm, args.arm),
             "ewc_lam": EWC_LAM if args.arm == "ewc" else None,
             "pretrain": {"samples": PRETRAIN_SAMPLES, "epochs": PRETRAIN_EPOCHS,
@@ -475,6 +494,11 @@ def parse_args():
     ap.add_argument("--arm", default="scratch", choices=ARMS)
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--profile", default="ideal", choices=list(NOISE_PROFILES))
+    ap.add_argument("--label-mode", choices=["local", "global"], default="local",
+                    help="global: remap per-task labels to their class offsets "
+                         "(true task-IL/class-IL with the shared head); "
+                         "local: keep the two local labels (shared binary "
+                         "readout, the E1 two-task protocol semantics).")
     ap.add_argument("--tag", default=None)
     ap.add_argument("--n-qubits", type=int, default=4)
     ap.add_argument("--n-components", type=int, default=None)
