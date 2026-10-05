@@ -1,0 +1,110 @@
+--campaign chain4 --arm scratch --seed 0 --label-mode global
+--campaign chain4 --arm synth --seed 0 --label-mode global
+--campaign chain4 --arm scratch --seed 1 --label-mode global
+--campaign chain4 --arm synth --seed 1 --label-mode global
+--campaign chain4 --arm scratch --seed 2 --label-mode global
+--campaign chain4 --arm synth --seed 2 --label-mode global
+--campaign chain4 --arm scratch --seed 3 --label-mode global
+--campaign chain4 --arm synth --seed 3 --label-mode global
+--campaign chain4 --arm scratch --seed 4 --label-mode global
+--campaign chain4 --arm synth --seed 4 --label-mode global
+--campaign chain4 --arm scratch --seed 5 --label-mode global
+--campaign chain4 --arm synth --seed 5 --label-mode global
+--campaign chain4 --arm scratch --seed 6 --label-mode global
+--campaign chain4 --arm synth --seed 6 --label-mode global
+--campaign chain4 --arm scratch --seed 7 --label-mode global
+--campaign chain4 --arm synth --seed 7 --label-mode global
+--campaign chain4 --arm scratch --seed 8 --label-mode global
+--campaign chain4 --arm synth --seed 8 --label-mode global
+--campaign chain4 --arm scratch --seed 9 --label-mode global
+--campaign chain4 --arm synth --seed 9 --label-mode global
+--campaign chain4 --arm scratch --seed 0 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 0 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 1 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 1 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 2 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 2 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 3 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 3 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 4 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 4 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 5 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 5 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 6 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 6 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 7 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 7 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 8 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 8 --profile heron_r2 --label-mode global
+--campaign chain4 --arm scratch --seed 9 --profile heron_r2 --label-mode global
+--campaign chain4 --arm synth --seed 9 --profile heron_r2 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 0 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 1 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 2 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 3 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 4 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 5 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 6 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 7 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 8 --label-mode global
+--campaign sfmnist5 --arm scratch --seed 9 --label-mode global
+--campaign sfmnist5 --arm synth --seed 0 --label-mode global
+--campaign sfmnist5 --arm synth --seed 1 --label-mode global
+--campaign sfmnist5 --arm synth --seed 2 --label-mode global
+--campaign sfmnist5 --arm synth --seed 3 --label-mode global
+--campaign sfmnist5 --arm synth --seed 4 --label-mode global
+--campaign sfmnist5 --arm synth --seed 5 --label-mode global
+--campaign sfmnist5 --arm synth --seed 6 --label-mode global
+--campaign sfmnist5 --arm synth --seed 7 --label-mode global
+--campaign sfmnist5 --arm synth --seed 8 --label-mode global
+--campaign sfmnist5 --arm synth --seed 9 --label-mode global
+--campaign smnist5 --arm ewc --seed 0 --label-mode global
+--campaign smnist5 --arm ewc --seed 1 --label-mode global
+--campaign smnist5 --arm ewc --seed 2 --label-mode global
+--campaign smnist5 --arm ewc --seed 3 --label-mode global
+--campaign smnist5 --arm ewc --seed 4 --label-mode global
+--campaign smnist5 --arm ewc --seed 5 --label-mode global
+--campaign smnist5 --arm ewc --seed 6 --label-mode global
+--campaign smnist5 --arm ewc --seed 7 --label-mode global
+--campaign smnist5 --arm ewc --seed 8 --label-mode global
+--campaign smnist5 --arm ewc --seed 9 --label-mode global
+--campaign smnist5 --arm scratch --seed 0 --label-mode global
+--campaign smnist5 --arm scratch --seed 1 --label-mode global
+--campaign smnist5 --arm scratch --seed 2 --label-mode global
+--campaign smnist5 --arm scratch --seed 3 --label-mode global
+--campaign smnist5 --arm scratch --seed 4 --label-mode global
+--campaign smnist5 --arm scratch --seed 5 --label-mode global
+--campaign smnist5 --arm scratch --seed 6 --label-mode global
+--campaign smnist5 --arm scratch --seed 7 --label-mode global
+--campaign smnist5 --arm scratch --seed 8 --label-mode global
+--campaign smnist5 --arm scratch --seed 9 --label-mode global
+--campaign smnist5 --arm synth --seed 0 --label-mode global
+--campaign smnist5 --arm synth --seed 1 --label-mode global
+--campaign smnist5 --arm synth --seed 2 --label-mode global
+--campaign smnist5 --arm synth --seed 3 --label-mode global
+--campaign smnist5 --arm synth --seed 4 --label-mode global
+--campaign smnist5 --arm synth --seed 5 --label-mode global
+--campaign smnist5 --arm synth --seed 6 --label-mode global
+--campaign smnist5 --arm synth --seed 7 --label-mode global
+--campaign smnist5 --arm synth --seed 8 --label-mode global
+--campaign smnist5 --arm synth --seed 9 --label-mode global
+--campaign smnist5 --arm scratch --seed 0 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm synth --seed 0 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm scratch --seed 1 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm synth --seed 1 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm scratch --seed 2 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm synth --seed 2 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm scratch --seed 3 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm synth --seed 3 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm scratch --seed 4 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm synth --seed 4 --profile heron_r2 --label-mode global
+--campaign smnist5 --arm er --seed 0 --label-mode global
+--campaign smnist5 --arm er --seed 1 --label-mode global
+--campaign smnist5 --arm er --seed 2 --label-mode global
+--campaign smnist5 --arm er --seed 3 --label-mode global
+--campaign smnist5 --arm er --seed 4 --label-mode global
+--campaign smnist5 --arm er --seed 5 --label-mode global
+--campaign smnist5 --arm er --seed 6 --label-mode global
+--campaign smnist5 --arm er --seed 7 --label-mode global
+--campaign smnist5 --arm er --seed 8 --label-mode global
+--campaign smnist5 --arm er --seed 9 --label-mode global

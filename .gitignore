@@ -8,6 +8,7 @@ logs/
 results_seed_*.json
 results_noisy_*.json
 cmds_*.txt
+!hercules_launch/cmds_e234*.txt
 run_noisy_5seeds.log
 *.png
 *.aux

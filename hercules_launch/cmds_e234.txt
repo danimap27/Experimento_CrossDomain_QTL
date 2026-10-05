@@ -1,0 +1,290 @@
+--campaign chain4 --arm scratch --seed 0
+--campaign chain4 --arm synth --seed 0
+--campaign chain4 --arm scratch --seed 1
+--campaign chain4 --arm synth --seed 1
+--campaign chain4 --arm scratch --seed 2
+--campaign chain4 --arm synth --seed 2
+--campaign chain4 --arm scratch --seed 3
+--campaign chain4 --arm synth --seed 3
+--campaign chain4 --arm scratch --seed 4
+--campaign chain4 --arm synth --seed 4
+--campaign chain4 --arm scratch --seed 5
+--campaign chain4 --arm synth --seed 5
+--campaign chain4 --arm scratch --seed 6
+--campaign chain4 --arm synth --seed 6
+--campaign chain4 --arm scratch --seed 7
+--campaign chain4 --arm synth --seed 7
+--campaign chain4 --arm scratch --seed 8
+--campaign chain4 --arm synth --seed 8
+--campaign chain4 --arm scratch --seed 9
+--campaign chain4 --arm synth --seed 9
+--campaign pair2 --arm scratch --seed 0
+--campaign pair2 --arm synth --seed 0
+--campaign pair2 --arm scratch --seed 1
+--campaign pair2 --arm synth --seed 1
+--campaign pair2 --arm scratch --seed 2
+--campaign pair2 --arm synth --seed 2
+--campaign pair2 --arm scratch --seed 3
+--campaign pair2 --arm synth --seed 3
+--campaign pair2 --arm scratch --seed 4
+--campaign pair2 --arm synth --seed 4
+--campaign pair2 --arm scratch --seed 5
+--campaign pair2 --arm synth --seed 5
+--campaign pair2 --arm scratch --seed 6
+--campaign pair2 --arm synth --seed 6
+--campaign pair2 --arm scratch --seed 7
+--campaign pair2 --arm synth --seed 7
+--campaign pair2 --arm scratch --seed 8
+--campaign pair2 --arm synth --seed 8
+--campaign pair2 --arm scratch --seed 9
+--campaign pair2 --arm synth --seed 9
+--campaign pair2 --arm scratch --seed 0 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 0 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 1 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 1 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 2 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 2 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 3 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 3 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 4 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 4 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 5 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 5 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 6 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 6 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 7 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 7 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 8 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 8 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 9 --n-layers 2 --tag L2
+--campaign pair2 --arm synth --seed 9 --n-layers 2 --tag L2
+--campaign pair2 --arm scratch --seed 0 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 0 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 1 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 1 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 2 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 2 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 3 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 3 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 4 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 4 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 5 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 5 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 6 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 6 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 7 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 7 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 8 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 8 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 9 --n-layers 4 --tag L4
+--campaign pair2 --arm synth --seed 9 --n-layers 4 --tag L4
+--campaign pair2 --arm scratch --seed 0 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 0 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 1 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 1 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 2 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 2 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 3 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 3 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 4 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 4 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 5 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 5 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 6 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 6 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 7 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 7 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 8 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 8 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 9 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm synth --seed 9 --n-qubits 6 --n-components 6 --tag q6
+--campaign pair2 --arm scratch --seed 0 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 0 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 1 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 1 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 2 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 2 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 3 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 3 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 4 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 4 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 5 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 5 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 6 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 6 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 7 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 7 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 8 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 8 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 9 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm synth --seed 9 --n-qubits 8 --n-components 8 --tag q8
+--campaign pair2 --arm scratch --seed 0 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 0 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 1 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 1 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 2 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 2 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 3 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 3 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 4 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 4 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 5 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 5 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 6 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 6 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 7 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 7 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 8 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 8 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 9 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm synth --seed 9 --limit-train 500 --limit-test 2000 --tag sz500
+--campaign pair2 --arm scratch --seed 0 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 0 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 1 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 1 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 2 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 2 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 3 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 3 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 4 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 4 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 5 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 5 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 6 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 6 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 7 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 7 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 8 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 8 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 9 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm synth --seed 9 --limit-train 2000 --limit-test 2000 --tag sz2k
+--campaign pair2 --arm scratch --seed 0 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 0 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 1 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 1 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 2 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 2 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 3 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 3 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 4 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 4 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 5 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 5 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 6 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 6 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 7 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 7 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 8 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 8 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm scratch --seed 9 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign pair2 --arm synth --seed 9 --limit-train 12000 --limit-test 2000 --tag sz12k
+--campaign smnist5 --arm ewc --seed 0
+--campaign smnist5 --arm ewc --seed 1
+--campaign smnist5 --arm ewc --seed 2
+--campaign smnist5 --arm ewc --seed 3
+--campaign smnist5 --arm ewc --seed 4
+--campaign smnist5 --arm ewc --seed 5
+--campaign smnist5 --arm ewc --seed 6
+--campaign smnist5 --arm ewc --seed 7
+--campaign smnist5 --arm ewc --seed 8
+--campaign smnist5 --arm ewc --seed 9
+--campaign smnist5 --arm scratch --seed 0
+--campaign smnist5 --arm scratch --seed 1
+--campaign smnist5 --arm scratch --seed 2
+--campaign smnist5 --arm scratch --seed 3
+--campaign smnist5 --arm scratch --seed 4
+--campaign smnist5 --arm scratch --seed 5
+--campaign smnist5 --arm scratch --seed 6
+--campaign smnist5 --arm scratch --seed 7
+--campaign smnist5 --arm scratch --seed 8
+--campaign smnist5 --arm scratch --seed 9
+--campaign smnist5 --arm synth --seed 0
+--campaign smnist5 --arm synth --seed 1
+--campaign smnist5 --arm synth --seed 2
+--campaign smnist5 --arm synth --seed 3
+--campaign smnist5 --arm synth --seed 4
+--campaign smnist5 --arm synth --seed 5
+--campaign smnist5 --arm synth --seed 6
+--campaign smnist5 --arm synth --seed 7
+--campaign smnist5 --arm synth --seed 8
+--campaign smnist5 --arm synth --seed 9
+--campaign sfmnist5 --arm scratch --seed 0
+--campaign sfmnist5 --arm scratch --seed 1
+--campaign sfmnist5 --arm scratch --seed 2
+--campaign sfmnist5 --arm scratch --seed 3
+--campaign sfmnist5 --arm scratch --seed 4
+--campaign sfmnist5 --arm scratch --seed 5
+--campaign sfmnist5 --arm scratch --seed 6
+--campaign sfmnist5 --arm scratch --seed 7
+--campaign sfmnist5 --arm scratch --seed 8
+--campaign sfmnist5 --arm scratch --seed 9
+--campaign sfmnist5 --arm synth --seed 0
+--campaign sfmnist5 --arm synth --seed 1
+--campaign sfmnist5 --arm synth --seed 2
+--campaign sfmnist5 --arm synth --seed 3
+--campaign sfmnist5 --arm synth --seed 4
+--campaign sfmnist5 --arm synth --seed 5
+--campaign sfmnist5 --arm synth --seed 6
+--campaign sfmnist5 --arm synth --seed 7
+--campaign sfmnist5 --arm synth --seed 8
+--campaign sfmnist5 --arm synth --seed 9
+--campaign chain4 --arm scratch --seed 0 --profile heron_r2
+--campaign chain4 --arm synth --seed 0 --profile heron_r2
+--campaign chain4 --arm scratch --seed 1 --profile heron_r2
+--campaign chain4 --arm synth --seed 1 --profile heron_r2
+--campaign chain4 --arm scratch --seed 2 --profile heron_r2
+--campaign chain4 --arm synth --seed 2 --profile heron_r2
+--campaign chain4 --arm scratch --seed 3 --profile heron_r2
+--campaign chain4 --arm synth --seed 3 --profile heron_r2
+--campaign chain4 --arm scratch --seed 4 --profile heron_r2
+--campaign chain4 --arm synth --seed 4 --profile heron_r2
+--campaign chain4 --arm scratch --seed 5 --profile heron_r2
+--campaign chain4 --arm synth --seed 5 --profile heron_r2
+--campaign chain4 --arm scratch --seed 6 --profile heron_r2
+--campaign chain4 --arm synth --seed 6 --profile heron_r2
+--campaign chain4 --arm scratch --seed 7 --profile heron_r2
+--campaign chain4 --arm synth --seed 7 --profile heron_r2
+--campaign chain4 --arm scratch --seed 8 --profile heron_r2
+--campaign chain4 --arm synth --seed 8 --profile heron_r2
+--campaign chain4 --arm scratch --seed 9 --profile heron_r2
+--campaign chain4 --arm synth --seed 9 --profile heron_r2
+--campaign pair2 --arm scratch --seed 0 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 0 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 1 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 1 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 2 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 2 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 3 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 3 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 4 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 4 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 5 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 5 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 6 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 6 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 7 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 7 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 8 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 8 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm scratch --seed 9 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign pair2 --arm synth --seed 9 --limit-train 12000 --limit-test 2000 --tag sz12k --profile heron_r2
+--campaign smnist5 --arm scratch --seed 0 --profile heron_r2
+--campaign smnist5 --arm synth --seed 0 --profile heron_r2
+--campaign smnist5 --arm scratch --seed 1 --profile heron_r2
+--campaign smnist5 --arm synth --seed 1 --profile heron_r2
+--campaign smnist5 --arm scratch --seed 2 --profile heron_r2
+--campaign smnist5 --arm synth --seed 2 --profile heron_r2
+--campaign smnist5 --arm scratch --seed 3 --profile heron_r2
+--campaign smnist5 --arm synth --seed 3 --profile heron_r2
+--campaign smnist5 --arm scratch --seed 4 --profile heron_r2
+--campaign smnist5 --arm synth --seed 4 --profile heron_r2
+--campaign smnist5 --arm er --seed 0
+--campaign smnist5 --arm er --seed 1
+--campaign smnist5 --arm er --seed 2
+--campaign smnist5 --arm er --seed 3
+--campaign smnist5 --arm er --seed 4
+--campaign smnist5 --arm er --seed 5
+--campaign smnist5 --arm er --seed 6
+--campaign smnist5 --arm er --seed 7
+--campaign smnist5 --arm er --seed 8
+--campaign smnist5 --arm er --seed 9
