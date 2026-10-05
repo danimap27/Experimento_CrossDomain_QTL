@@ -1,0 +1,5 @@
+--extract-cifar --classes 0 1 --limit-train 2000 --limit-test 400
+--extract-cifar --classes 2 3 --limit-train 2000 --limit-test 400
+--extract-cifar --classes 4 5 --limit-train 2000 --limit-test 400
+--extract-cifar --classes 6 7 --limit-train 2000 --limit-test 400
+--extract-cifar --classes 8 9 --limit-train 2000 --limit-test 400

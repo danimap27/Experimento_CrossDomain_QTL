@@ -123,7 +123,8 @@ class DataModule:
 
         return torch.tensor(X_pca, dtype=torch.float32), torch.tensor(y, dtype=torch.long), pca
 
-    def _task_from_dataset(self, train_set, test_set, classes, pca_model=None, limit_train=1000, limit_test=200):
+    def _task_from_dataset(self, train_set, test_set, classes, pca_model=None,
+                           limit_train=1000, limit_test=200):
         X_train, y_train, trained_pca = self._process_dataset(
             train_set, classes, pca=pca_model, is_train=(pca_model is None), limit_samples=limit_train)
         X_test, y_test, _ = self._process_dataset(
@@ -134,23 +135,29 @@ class DataModule:
 
         return train_loader, test_loader, trained_pca
 
-    def get_mnist_task(self, classes=(0, 1), pca_model=None):
+    def get_mnist_task(self, classes=(0, 1), pca_model=None,
+                       limit_train=1000, limit_test=200):
         """Loads MNIST filtered to 2 classes."""
         transform = transforms.Compose([transforms.ToTensor()])
         train_set = torchvision.datasets.MNIST(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.MNIST(root=self.data_dir, train=False, download=True, transform=transform)
-        return self._task_from_dataset(train_set, test_set, classes, pca_model)
+        return self._task_from_dataset(train_set, test_set, classes, pca_model,
+                                       limit_train=limit_train, limit_test=limit_test)
 
-    def get_fashion_mnist_task(self, classes=(0, 1), pca_model=None):
+    def get_fashion_mnist_task(self, classes=(0, 1), pca_model=None,
+                               limit_train=1000, limit_test=200):
         """Loads Fashion-MNIST filtered to 2 classes."""
         transform = transforms.Compose([transforms.ToTensor()])
         train_set = torchvision.datasets.FashionMNIST(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.FashionMNIST(root=self.data_dir, train=False, download=True, transform=transform)
-        return self._task_from_dataset(train_set, test_set, classes, pca_model)
+        return self._task_from_dataset(train_set, test_set, classes, pca_model,
+                                       limit_train=limit_train, limit_test=limit_test)
 
-    def get_kmnist_task(self, classes=(0, 1), pca_model=None):
+    def get_kmnist_task(self, classes=(0, 1), pca_model=None,
+                        limit_train=1000, limit_test=200):
         """Loads KMNIST filtered to 2 classes (repair 3.7: TIL-3 source, E2)."""
         transform = transforms.Compose([transforms.ToTensor()])
         train_set = torchvision.datasets.KMNIST(root=self.data_dir, train=True, download=True, transform=transform)
         test_set = torchvision.datasets.KMNIST(root=self.data_dir, train=False, download=True, transform=transform)
-        return self._task_from_dataset(train_set, test_set, classes, pca_model)
+        return self._task_from_dataset(train_set, test_set, classes, pca_model,
+                                       limit_train=limit_train, limit_test=limit_test)

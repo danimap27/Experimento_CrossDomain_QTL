@@ -26,8 +26,12 @@ learning-rate paragraph and the PPI2505 acknowledgment).
    payloads stored in this repository (the noise-profile sweep under
    `../results/`) give QTL drops of 65.10 / 65.10 / 61.20, while the
    baselines match the PDF exactly (72.10 / 72.90 / 70.50). The provenance of
-   the Table II QTL values is unresolved. Confirm which execution produced
-   them before reusing these numbers in any derivative manuscript.
+   the Table II QTL values is unresolved. Forensics (3 Oct 2026): a broad
+   search across every campaign stored on the homelab (this repository, the
+   `cross-domain-qcl` framework runs, and the controlled E1 campaign) finds
+   **no execution that reproduces 42.60 / 44.10 / 47.20**. Only the
+   corresponding author can clarify which run produced them. Do not reuse
+   these numbers in any derivative manuscript until that is settled.
 2. **Experiment 1 protocol text.** The submission states that the lowest
    layer is frozen during the sequential phase and that the learning-rate
    schedule is applied identically to the baseline and the QTL arms. The code

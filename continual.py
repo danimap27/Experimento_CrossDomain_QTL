@@ -201,7 +201,11 @@ def train_task(model, train_loader, epochs, lr, criterion=None, eval_old_loader=
                 loss = loss + l_rep
 
             if ewc is not None:
-                l_ewc = ewc_penalty(model, ewc["fisher"], ewc["theta_star"], ewc["lam"])
+                ewc_specs = ewc if isinstance(ewc, (list, tuple)) else [ewc]
+                l_ewc = None
+                for spec in ewc_specs:
+                    term = ewc_penalty(model, spec["fisher"], spec["theta_star"], spec["lam"])
+                    l_ewc = term if l_ewc is None else l_ewc + term
                 loss = loss + l_ewc
 
             loss.backward()
