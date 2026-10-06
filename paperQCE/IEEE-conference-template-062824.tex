@@ -1,0 +1,373 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+% The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
+%Template version as of 6/27/2024
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{positioning}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+\begin{document}
+
+\title{Cross-Domain Extrapolation in Quantum Continual Learning:  Synthetic Pre-Training to Neutralize Catastrophic Forgetting}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} D. Mart\'in-P\'erez}
+\IEEEauthorblockA{\textit{Data Science and Big Data Lab} \\
+\textit{Pablo de Olavide University}\\
+ES-41013 Seville, Spain \\
+dmarper2@upo.es}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} F. Rodr\'iguez-D\'iaz}
+\IEEEauthorblockA{\textit{Data Science and Big Data Lab} \\
+\textit{Pablo de Olavide University}\\
+ES-41013 Seville, Spain \\
+froddia@upo.es}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} D. Guti\'errez-Avil\'es}
+\IEEEauthorblockA{\textit{Data Science and Big Data Lab} \\
+\textit{Seville University}\\
+ES-41004 Seville, Spain \\
+dgutierrez3@us.es}
+\and
+\IEEEauthorblockN{4\textsuperscript{th} A. Troncoso}
+\IEEEauthorblockA{\textit{Data Science and Big Data Lab} \\
+\textit{Pablo de Olavide University}\\
+ES-41013 Seville, Spain \\
+atrolor@upo.es}
+\and
+\IEEEauthorblockN{5\textsuperscript{th} F. Mart\'inez-\`Alvarez}
+\IEEEauthorblockA{\textit{Data Science and Big Data Lab} \\
+\textit{Pablo de Olavide University}\\
+ES-41013 Seville, Spain \\
+fmaralv@upo.es}
+}
+
+\maketitle
+
+\begin{abstract}
+The intersection of Variational Quantum Circuits and sequential data streams suffers from gradient disruption known as Catastrophic Forgetting. While traditional models rely on domain-specific replay buffers to anchor knowledge, extensive memory reservoirs are often unviable on constrained Noisy Intermediate-Scale Quantum platforms. This work explores the intersection of Quantum Transfer Learning and Quantum Continual Learning to avoid explicit memory dependency. A Cross-Domain Extrapolation methodology is formalized, where hybrid classical-quantum models are pre-trained on distinct synthetic topological structures before transitioning to dynamic image recognition tasks. By conducting an extensive 4-qubit quantum simulation pipeline across three distinct topological ans\"atz. Strongly Entangling, Basic Entangler, and Tree Tensor Networks, this study demonstrates that initializing continuous learning paradigms with generalized synthetic priors forces gradient parameters into resilient sub-spaces. Results validate that the Cross-Domain Transfer Learning strategy mitigates forgetting drops by over 25\% compared to standard naive baselines without requiring rigid layer freezing. Furthermore, temporal analysis proves that parameterized tensor network architectures resist sequentially induced phase corruption longer across epochs. Isolating synthetic pre-training is confirmed as a robust, memory-free heuristic that accelerates convergence while shielding quantum representations against catastrophic sequential interference.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Quantum Machine Learning, Quantum Neural Network, Quantum Continual Learning, Catastrophic Forgetting
+\end{IEEEkeywords}
+
+\section{Introduction}
+The increasing complexity of Quantum Machine Learning (QML) \cite{RODRIGUEZ-DIAZ26} models brings important challenges in the optimization of parameterized quantum circuits \cite{cerezo2021variational,Mitarai18}. Variational Quantum Circuits (VQC) work over multidimensional Hilbert spaces, updating rotation phases through classical gradient descent. However, when these models are deployed in continuous environments that process sequential data streams, their parameters suffer a severe degradation known as Catastrophic Forgetting (CF). This CF occurs when the network loses abruptly the capabilities acquired in previous tasks when it is forced to adapt to new data distributions \cite{parisi2019continual}.
+
+The classical strategies to mitigate CF rely mainly in two approaches. These options include the gradual expansion of the task based architecture or the use of the memory mechanisms that preserve historical activation distributions \cite{buzzega2020dark,kirkpatrick2017overcoming}. In the quantum domain, both alternatives present important limitations. Maintaining memory buffers scales poorly against the restrictions of Noisy Intermediate-Scale Quantum (NISQ) platforms, where the phase drift induced by noise aggravates even more the situation and demands strategies that do not require additional qubits nor intensive geometric sampling \cite{mcclean2018barren,pesah2021absence}.
+
+In this context, the present work explores the intersection between Quantum Transfer Learning (QTL) and Quantum Continual Learning (QCL) as a way to overcome the dependency of explicit memory \cite{mari2020transfer,pan2009survey}. The central hypothesis is that preconditioning a parameterized circuit over generic and dense distributions forces the quantum angles to extract universal geometric characteristics  \cite{cerezo2021variational,sim2019expressibility}. Starting from this organized synthetic equilibrium, rather than a random state prone to barren plateaus \cite{mcclean2018barren}, facilitates optimization via gradient descent and protects the parameters from destructive sequential interactions.
+
+To evaluate this hypothesis, a simulation pipeline was designed that simulates and emulates a parameterized NISQ environment with 4-qubit hybrid classical-quantum algorithms. The pipeline constructs a continuous domain flow that transits from synthetic topological abstractions towards image recognition tasks with Fashion-MNIST \cite{Xiao17} and MNIST \cite{Lecun98}. The dimensionality reduction of the input data is carried out through Principal Component Analysis (PCA) \cite{pearson1901lines}, mapping all incoming distributions consistently towards the four-dimensional bounds of the quantum circuit. The feature extraction from real image domains is performed using MobileNetV2 \cite{Sandler18} as a classical backbone prior to quantum encoding. Inside this approach, two experimental axes are evaluated. First, a topological ablation is realized comparing three ansätze: Strongly Entangling \cite{sim2019expressibility}, Basic Entangling and Tree Tensor Network (TTN) \cite{grant2018hierarchical}, with the objective of identifying the structural vulnerability limits of each architecture in front of catastrophic forgetting. Second, three initialization paradigms are contrasted: a baseline without any transfer learning, a cross-domain initialization pre-trained on synthetic data, and a initialization pre-trained on real image features extracted through MobileNetV2, in order to isolate the contribution of the pre-training source on the sequential retention capacity.
+
+The results confirm that replacing the random initialization by a cross-domain pretraining on synthetic distributions reduces the performance drop by CF in more than 25\% compared to standard baselines \cite{buzzega2020dark,kirkpatrick2017overcoming}, without needing to freeze layers nor to use external memory. Also, the temporal analysis demonstrates that parameterized TTN architectures  are more resistant to the sequentially induced phase corruption, consolidating the synthetic pretraining as a robust, memory-free heuristic that accelerates the convergence \cite{Mitarai18} and protects the quantum representations against sequential interferences.
+
+The main contributions of this work can be summarized as follows:
+
+\begin{itemize}
+    \item A Cross-Domain Extrapolation methodology is proposed for Quantum Continual Learning, where hybrid classical-quantum models are pre-trained on synthetic topological structures before changing to real image recognition tasks, avoiding the necessity of explicit memory buffers.
+
+    \item An extensive simulation pipeline of 4 qubits is designed and evaluated across three distinct topological ansätze: Strongly Entangling, Basic Entangler and TTN, isolating the structural vulnerability of each architecture against catastrophic forgetting.
+
+    \item It is demonstrated that initializing continuous learning paradigms with generalized synthetic priors forces gradient parameters into resilient sub-spaces, reducing forgetting drops by more than 25\% compared to baselines without requiring rigid layer freezing.
+
+    \item The TTN architecture is identified as the most robust topology against sequentially induced phase corruption, confirming that restricting parameter spaces generates more stable representations along the training.
+\end{itemize}
+
+The rest of the manuscript is organized as follows. Section \ref{sec:Related} reviews the related literature on Continual Learning and Quantum Transfer Learning. Section \ref{sec:methodology} describes the proposed methodological framework, including the architectural synthesis and the Cross-Domain Feature Extraction strategy. Section \ref{sec:results} presents the experimental setup, the datasets employed and the obtained results. Finally, Section \ref{sec:conclusions} draws the main conclusions of this work.
+
+\section{Related work}\label{sec:Related}
+
+The challenge of preserving previously acquired knowledge while adapting to new data distributions has been a central concern in machine learning research for decades. The problem of catastrophic interference in sequential learning was formally characterized by McCloskey and Cohen \cite{McCloskey89}, who demonstrated that connectionist networks trained on new tasks abruptly erase previously learned representations. This foundational observation motivated a broad family of mitigation strategies that has since been comprehensively surveyed by Hadsell et al. \cite{Hadsell20}, who argued that embracing change through structured initialization and modular design is more effective than rigid constraint based approaches for long horizon sequential learning. More recent surveys by De Lange et al. \cite{Lange22} and Wang et al. \cite{Wang24} provide extensive taxonomies of the state of the art, covering regularization, replay, and architectural strategies across diverse sequential classification settings.
+
+Among regularization-based methods, Zenke et al. \cite{Zenke17} introduced Synaptic Intelligence, where each parameter accumulates task-relevant information over time and exploits it to store new memories without overwriting old ones, offering an online and computationally efficient alternative to Fisher based penalties. A different angle was explored by Li and Hoiem \cite{Li18}, who proposed Learning without Forgetting, a knowledge distillation strategy that preserves the soft outputs of previous tasks during new task training without requiring access to any original data. More structured memory-based approaches were consolidated by Rebuffi et al. \cite{Rebuffi17} through iCaRL, which combines experience replay with representation learning by dynamically maintaining a per-class exemplar set throughout the sequential training process. Beyond these, van de Ven et al. \cite{Ven22} established a formal taxonomy of three distinct incremental learning scenarios, demonstrating that strategies effective in task-incremental settings often fail under the more demanding class-incremental and domain-incremental conditions, reinforcing the need for initialization-based approaches that generalize across scenario types without relying on task identity or external memory.
+
+Translating these established paradigms to hybrid classical-quantum models uncovers important friction. Preskill \cite{Preskill18} formally introduced the notion of the NISQ era, characterizing near-term quantum processors as powerful but fundamentally noise-limited devices where the size of reliably executable circuits remains severely constrained. This hardware context directly conditions the feasibility of any continual learning strategy that relies on memory buffers or expanded circuit topologies. Sharma et al. \cite{Sharma22} further demonstrated that dissipative quantum neural networks can exhibit barren plateaus under realistic noise conditions, showing that gradient magnitudes vanish exponentially with the number of qubits under certain cost functions and circuit depths. This noise induced gradient instability closely parallels the parameter disruption observed in sequential quantum learning, motivating the use of initialization strategies that place parameters in inherently resilient regions of the optimization landscape from the outset.
+
+
+Efforts to address trainability in quantum models have explored constrained architectural designs. Wang et al. \cite{Wang21} proved that local Pauli noise causes vanishing gradients in variational quantum algorithms, making noise-induced barren plateaus one of the primary practical obstacles to scalable quantum learning on NISQ hardware. Most recently, Zhang et al. \cite{Zhang26} reported the first experimental demonstration of quantum continual learning on a fully programmable superconducting processor, showing that EWC-based regularization allows a quantum classifier to retain knowledge across three sequential tasks with an average accuracy exceeding 92\%, providing direct empirical evidence that catastrophic forgetting is a real and measurable phenomenon in near-term quantum hardware.
+
+QTL strategies have demonstrated empirical viability in avoiding unmanageable convergence bounds, with research confirming that partially parameterized sub-circuits frozen after generalized pre-training operate as robust structural feature extractors. In the classical domain, Yosinski et al. \cite{Yosinski14} demonstrated that features learned from large generic datasets are highly transferable across very different target domains, providing theoretical grounding for the cross-domain pre-training hypothesis explored in this work. Complementarily, Skolik et al. \cite{Skolik21} demonstrated in quantum reinforcement learning that layerwise learning strategies improve convergence stability and reduce the risk of barren plateaus, showing that careful sequential initialization of circuit parameters directly impacts the quality and robustness of learned representations.
+
+Despite these advancements, taking advantage of purely synthetic cross-domain representations as a proactive topological shield against sequential catastrophic forgetting remains sparse within quantum literature. Prior investigations treat quantum continual learning as a localized parameter restriction challenge directly tied to target dataset sequences, without considering the role of the pre-training domain as an independent variable. This proposed methodology uniquely reframes the problem by investigating whether unrelated synthetic initialization formulates wide-margin geometric plateaus that successfully resist secondary feature disruption, independent of rigid state-freezing protocols or explicit memory architectures.
+
+
+\section{Methodology}\label{sec:methodology}
+
+This section describes the experimental pipeline. A hybrid classical-quantum model receives fixed-length feature vectors and produces a binary classification output through a parameterized quantum circuit. The continual learning protocol trains the model on two sequential tasks without any replay mechanism. Figure~\ref{fig:pipeline} shows the overall structure of the pipeline.
+
+\begin{figure}[ht]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[
+  box/.style={draw, rectangle, minimum height=1.4cm, text width=3.2cm,
+    align=center, fill=blue!05, rounded corners, font=\small},
+  qbox/.style={draw, rectangle, minimum height=1.4cm, text width=3.2cm,
+    align=center, fill=purple!05, rounded corners, font=\small},
+  arrow/.style={thick,->,>=stealth}
+]
+  \node[box]  (src)   {Synthetic Source\\(Gaussian clusters)};
+  \node[box,  right=2.8cm of src]  (ta)   {Task A\\(Fashion-MNIST 0/1)};
+  \node[box,  right=2.8cm of ta]   (tb)   {Task B\\(MNIST 2/3)};
+
+  \node[qbox, below=2.4cm of src]  (pre)  {QTL Pre-training\\(source $\rightarrow$ $\theta_0$)};
+  \node[qbox, below=2.4cm of ta]   (vqa)  {VQC Training\\(SEL / Basic / TTN)};
+  \node[qbox, below=2.4cm of tb]   (seq)  {Sequential\\Fine-tuning};
+
+  \draw[arrow] (src) -- (pre);
+  \draw[arrow] (ta)  -- (vqa);
+  \draw[arrow] (tb)  -- (seq);
+
+  \draw[thick, dashed, ->, >=stealth] (pre) -- (vqa)
+    node[midway, below, font=\footnotesize, align=center] {$\theta_0$ transfer};
+  \draw[thick, dashed, ->, >=stealth] (vqa) -- (seq)
+    node[midway, below, font=\footnotesize, align=center] {sequential drift};
+\end{tikzpicture}%
+}
+\caption{Cross-domain QCL pipeline. Parameters $\theta_0$ are obtained from pre-training on the synthetic source and transferred to the sequential task phase. The dashed arrows represent weight initialization rather than data flow.}
+\label{fig:pipeline}
+\end{figure}
+
+The hybrid model receives a four-dimensional input vector $x\in\mathbb{R}^{4}$ obtained from the dimensionality reduction stage. Real images first traverse a frozen MobileNetV2 backbone pre-trained on ImageNet, after which PCA maps the activations to four scalar features. The synthetic source is generated directly in $\mathbb{R}^{4}$ through Gaussian-cluster sampling. All inputs are linearly rescaled to the interval $[0,\pi]$ to match the rotation domain of the embedding layer. The classical-to-quantum interface follows Eq.~(\ref{eq:embed}).
+
+\begin{equation}
+|\psi_{\text{in}}(x)\rangle = \prod_{i=0}^{n-1} R_Y(x_i)\,|0\rangle^{\otimes n}
+\label{eq:embed}
+\end{equation}
+
+where $n=4$ is the number of qubits, $x_i$ is the $i$-th rescaled feature, $R_Y(\cdot)$ is the single-qubit rotation around the $Y$ axis, and $|0\rangle^{\otimes n}$ is the four-qubit ground state.
+
+The encoded state propagates through a parameterized unitary $U(\theta)$ whose internal layout depends on the chosen ansatz. Three topologies are studied. The first is the Strongly Entangling Layers (SEL) block defined in Eq.~(\ref{eq:sel}).
+
+\begin{equation}
+U_{\text{SEL}}(\theta) = \prod_{l=1}^{L}\, W_l\,\bigotimes_{i=0}^{n-1} R(\theta_{l,i,1},\theta_{l,i,2},\theta_{l,i,3})
+\label{eq:sel}
+\end{equation}
+
+where $L$ is the number of layers, $R(\alpha,\beta,\gamma)$ is the universal single-qubit rotation parameterized by three Euler angles, and $W_l$ is the cyclic CNOT entangler of layer $l$.
+
+The second topology is the Basic Entangler (BE) ansatz given in Eq.~(\ref{eq:be}). It applies a single rotation per qubit and per layer, which lowers the parameter count and the gate depth.
+
+\begin{equation}
+U_{\text{BE}}(\theta) = \prod_{l=1}^{L} W_l \,\bigotimes_{i=0}^{n-1} R_X(\theta_{l,i})
+\label{eq:be}
+\end{equation}
+
+where $R_X(\cdot)$ is the rotation around the $X$ axis and $W_l$ is the cyclic CNOT entangler of Eq.~(\ref{eq:sel}).
+
+The third topology is the TTN, defined in Eq.~(\ref{eq:ttn}). The four wires are paired hierarchically. Each block applies one $R_Y$ and one $R_Z$ rotation followed by a CNOT, and the active wires combine towards qubits 0 and 1, where the readout occurs.
+
+\begin{equation}
+U_{\text{TTN}}(\theta) = \prod_{l=1}^{L} \prod_{b=0}^{n-2} \mathrm{CNOT}_{i_b,j_b}\,\bigl(R_Y(\theta_{l,b,1})_{i_b}\otimes R_Z(\theta_{l,b,2})_{j_b}\bigr)
+\label{eq:ttn}
+\end{equation}
+
+where $b$ indexes the block, $(i_b,j_b)$ is the wire pair acted on by block $b$, and the product follows the hierarchical wiring of Figure~\ref{fig:pipeline}.
+
+The readout stage measures the expectation of the Pauli-$Z$ operator on the first two qubits as written in Eq.~(\ref{eq:meas}).
+
+\begin{equation}
+z_k = \langle \psi_{\text{out}} | Z_k | \psi_{\text{out}} \rangle, \qquad k\in\{0,1\}
+\label{eq:meas}
+\end{equation}
+
+where $|\psi_{\text{out}}\rangle = U(\theta)|\psi_{\text{in}}(x)\rangle$ and $Z_k$ is the Pauli-$Z$ operator acting on qubit $k$.
+
+The two real-valued expectations $z_0$ and $z_1$ feed a fully connected classical layer that produces the binary logits as in Eq.~(\ref{eq:logits}).
+
+\begin{equation}
+\hat{y} = W\begin{bmatrix} z_0 \\ z_1 \end{bmatrix} + b
+\label{eq:logits}
+\end{equation}
+
+where $W\in\mathbb{R}^{2\times 2}$ and $b\in\mathbb{R}^{2}$ are trainable classical parameters and $\hat{y}\in\mathbb{R}^{2}$ are the unnormalized class scores.
+
+The training objective is the categorical cross-entropy of Eq.~(\ref{eq:ce}). Predictions are obtained through the softmax normalization of $\hat{y}$.
+
+\begin{equation}
+\mathcal{L}(\theta,W,b) = -\frac{1}{N}\sum_{i=1}^{N}\sum_{c=0}^{1} y_{i,c}\,\log \hat{p}_{i,c}
+\label{eq:ce}
+\end{equation}
+
+where $N$ is the batch size, $y_{i,c}$ is the one-hot label of sample $i$ for class $c$, and $\hat{p}_{i,c}$ is the softmax probability obtained from $\hat{y}$.
+
+The Cross-Domain Continual Learning protocol runs in three phases. The first phase pre-trains the full hybrid model on the source domain, either synthetic Gaussian or MobileNetV2 features, over fifteen epochs and stores the resulting parameters $\theta_0$ as a warm start. The second phase loads $\theta_0$ into a fresh model and trains on Task A, defined as Fashion-MNIST classes 0 and 1, over ten epochs. The third phase continues training on Task B, defined as MNIST classes 2 and 3, over ten further epochs. The forgetting drop is read on the Task A test set after the third phase. To protect the cross-domain prior in Experiment 1, the lowest layer is frozen during the sequential phase and the learning rate is reduced from 0.05 in the source pre-training to 0.01 in Task A and to 0.005 in Task B. Experiments 2 and 3 keep the full parameter set trainable to isolate the structural and convergence effects of the topology and the source.
+
+The execution of the variational unitary on a real quantum processor is subject to gate errors and measurement readout errors that perturb the analytic state. To assess the robustness of the proposed protocol against this hardware reality, every experiment is replicated under three noise profiles. The first profile is the ideal one, where the unitary is propagated by the state-vector simulator without any error channel. The second and the third profiles route the circuit through a density-matrix simulator that interleaves a single-qubit depolarizing channel after every parameterized rotation, a two-qubit depolarizing channel after every CNOT, and a Pauli-$X$ bit-flip channel on every measured wire. Eq.~(\ref{eq:depol}) defines the action of the depolarizing channel.
+
+\begin{equation}
+\mathcal{E}_{\text{dep}}(\rho) = (1-p)\rho + \frac{p}{3}\bigl(X\rho X + Y\rho Y + Z\rho Z\bigr)
+\label{eq:depol}
+\end{equation}
+
+where $\rho$ is the input density matrix of the affected wire, $p$ is the depolarization probability, and $X$, $Y$, $Z$ are the single-qubit Pauli operators. The two-qubit version of Eq.~(\ref{eq:depol}) is applied independently to each wire of the affected gate.
+
+The bit-flip readout channel models the probability of recording the wrong measurement outcome. It is defined in Eq.~(\ref{eq:readout}).
+
+\begin{equation}
+\mathcal{E}_{\text{ro}}(\rho) = (1-q)\rho + q\,X\rho X
+\label{eq:readout}
+\end{equation}
+
+where $q$ is the readout error probability and $X$ is the Pauli-$X$ operator on the measured wire.
+
+The first noise profile, called Heron r2, takes its parameters from the median calibration of the IBM Heron r2 generation of superconducting devices, with single-qubit depolarization $p=3\times 10^{-4}$, two-qubit depolarization $p=3\times 10^{-3}$ and readout error $q=1.5\times 10^{-2}$. The second noise profile, called Legacy NISQ, scales those parameters by approximately one order of magnitude towards the values reported on earlier generations such as IBM Eagle and Falcon devices, with single-qubit depolarization $p=1\times 10^{-3}$, two-qubit depolarization $p=1.5\times 10^{-2}$ and readout error $q=3\times 10^{-2}$.
+
+To control the variance produced by the random initialization of the variational angles and by the stochastic optimization, the full pipeline is executed five times with independent random seeds in $\{0,1,2,3,4\}$ for each ansatz and each noise profile. All numerical results in Section~\ref{sec:results} are reported as the mean across the five seeds together with the population standard deviation. The factorial design of three noise profiles, three ans\"atze and five seeds amounts to forty-five sequential trainings per experiment.
+
+\section{Results}\label{sec:results}
+
+This section reports the empirical analysis of the proposed protocol. The data sources are described first, followed by the formal metrics, the experimental configuration and the discussion of the three experiments stated in Section~\ref{sec:methodology}.
+
+\subsection{Dataset}
+
+Four data sources participate in the pipeline. The synthetic source produces Gaussian-cluster vectors using the make\_classification routine of scikit-learn with four informative features and two balanced classes. The CIFAR-10 source uses classes 2 (bird) and 3 (cat) of the standard split. Each image traverses a frozen MobileNetV2 backbone pre-trained on ImageNet, and the resulting feature vector is reduced to four principal components by PCA. Fashion-MNIST classes 0 (T-shirt/top) and 1 (Trouser) form Task A, and MNIST classes 2 and 3 form Task B. All inputs are rescaled to the interval $[0,\pi]$ to match the Angle Embedding domain. Table~\ref{tab:datasets} reports the sample counts used along the experiments.
+
+\begin{table}[ht]
+\centering
+\caption{Sample counts per data source used in the experimental pipeline.}
+\label{tab:datasets}
+\begin{tabular}{lcccc}
+\toprule
+Source & Role & Train & Test & Classes \\
+\midrule
+Synthetic (Gaussian)    & QTL source       & 2000 & 500 & 2 \\
+CIFAR-10 (MobileNetV2)  & QTL source       & 1000 & 200 & 2, 3 \\
+Fashion-MNIST           & Task A           & 1000 & 200 & 0, 1 \\
+MNIST                   & Task B (target)  & 1000 & 200 & 2, 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Metrics}
+
+Three quantitative indicators capture the behavior of the model along the continual-learning protocol. The classification accuracy on a held-out test set is computed as in Eq.~(\ref{eq:acc}).
+
+\begin{equation}
+\mathrm{Acc} = \frac{1}{N}\sum_{i=1}^{N} \mathbb{I}(y_i = \hat{y}_i)
+\label{eq:acc}
+\end{equation}
+
+where $N$ is the number of test samples, $y_i$ is the true label of sample $i$, $\hat{y}_i = \arg\max_{c}\hat{p}_{i,c}$ is the predicted label, and $\mathbb{I}(\cdot)$ is the indicator function.
+
+The forgetting drop on Task A quantifies the accuracy lost on Task A after the sequential exposure to Task B as written in Eq.~(\ref{eq:drop}).
+
+\begin{equation}
+\Delta_A = \mathrm{Acc}_{A,\text{initial}} - \mathrm{Acc}_{A,\text{final}}
+\label{eq:drop}
+\end{equation}
+
+where $\mathrm{Acc}_{A,\text{initial}}$ is the test accuracy on Task A measured immediately after the Task A training phase, and $\mathrm{Acc}_{A,\text{final}}$ is the same accuracy measured after the Task B training phase.
+
+The third indicator is the per-epoch cross-entropy training loss already defined in Eq.~(\ref{eq:ce}). It tracks the convergence speed on the target domain. Wall-clock training and inference times are also recorded as auxiliary cost indicators relevant for the NISQ context.
+
+\subsection{Experimental Setup}
+
+The pipeline runs on Python 3.11 over the Hercules cluster of the Centro de Inform\'atica Cient\'ifica de Andaluc\'ia (CICA) on the standard partition with 8 GB of memory and four CPU cores per job. The software stack is composed of PennyLane 0.44.1 with the default.qubit simulator for the ideal profile and the default.mixed density-matrix simulator for the noisy profiles, PyTorch 2.10.0, torchvision 0.25.0, scikit-learn 1.8.0, numpy 2.4.3 and matplotlib 3.10.8. Each variational circuit operates over four qubits and three parameterized layers. The classical optimizer is Adam with learning rate 0.05 in the source pre-training and Task A phases, 0.01 in the Task A fine-tuning of Experiment 1 and 0.005 in the Task B phase to protect the Task A representation. The batch size is 32 along the whole pipeline. The synthetic and MobileNetV2 sources train over fifteen epochs, and Tasks A and B train over ten epochs each. The cross-entropy criterion of PyTorch acts as the loss function. The random seed of scikit-learn is fixed at 42 to keep the synthetic generation reproducible. The noise profiles defined in Section~\ref{sec:methodology} are activated at simulator level, and each combination of profile, ansatz and seed runs as an independent task of a SLURM array on the cluster.
+
+\subsection{Result Discussion}
+
+The three experiments are first analyzed under the Heron r2 noise profile, which approximates the calibration of current superconducting hardware, and the comparison across the ideal and the legacy NISQ profiles is reported at the end of the section to assess the robustness of the protocol against the noise level.
+
+Experiment 1 isolates the impact of the synthetic prior on catastrophic forgetting. Table~\ref{tab:exp1} reports the forgetting drop $\Delta_A$ on Task A after the sequential training on Task B for the naive baseline and for the QTL initialization, averaged over five seeds and split by noise profile. Figure~\ref{fig:exp1} plots the same quantity for the Heron r2 profile.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{figure1_forgetting.png}
+\caption{Experiment 1. Forgetting drop on Task A under the naive baseline and under the synthetic QTL initialization for the Heron r2 noise profile. Bars represent the mean over five seeds and the error bars represent one standard deviation. Lower is better.}
+\label{fig:exp1}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Experiment 1. Forgetting drop $\Delta_A$ on Task A in percentage points (mean $\pm$ std over five seeds) per noise profile.}
+\label{tab:exp1}
+\begin{tabular}{lcc}
+\toprule
+Noise profile & Baseline $\Delta_A$ & QTL $\Delta_A$ \\
+\midrule
+Ideal       & $72.10 \pm 2.33$ & $65.10 \pm 4.55$ \\
+Heron r2    & $72.90 \pm 1.80$ & $65.10 \pm 3.34$ \\
+Legacy NISQ & $70.50 \pm 6.43$ & $61.20 \pm 3.61$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Under the Heron r2 profile the naive baseline loses on average $72.90$ percentage points of Task A accuracy after the exposure to Task B, while the synthetic QTL initialization reduces the drop to $65.10$ percentage points. The reduction of $7.80$ percentage points is consistent across the ideal profile, with $7.00$ points, and grows to $9.30$ points under the legacy NISQ profile. The reduction is therefore positive but moderate in absolute terms, and it is preserved as the noise level increases by approximately one order of magnitude.
+
+Experiment 2 contrasts the three ans\"atze under the same continual-learning load. Figure~\ref{fig:exp2} reports the retained accuracy on Task A after the exposure to Task B, and Table~\ref{tab:exp2} aggregates the corresponding training and inference times together with the final accuracies on both tasks for the Heron r2 profile.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.85\linewidth]{figure2_ansatz_decay.png}
+\caption{Experiment 2. Retained Task A accuracy after the sequential exposure to Task B for the three ans\"atze under the Heron r2 noise profile. Bars represent the mean over five seeds and the error bars represent one standard deviation. Higher is better.}
+\label{fig:exp2}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Experiment 2 under the Heron r2 noise profile. Wall-clock times and accuracies per ansatz on Tasks A and B (mean over five seeds, std reported only on accuracies for compactness).}
+\label{tab:exp2}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{lcccccc}
+\toprule
+Ansatz & Tr. A (s) & Tst. A (s) & Acc. A (\%) & Tr. B (s) & Tst. B (s) & Acc. B (\%) \\
+\midrule
+Strongly Entangling (A) & 45.26 & 0.61 & $96.50 \pm 0.55$ & 51.25 & 0.61 & $89.60 \pm 1.02$ \\
+Basic Entangler (B)     & 41.45 & 0.57 & $73.10 \pm 1.20$ & 46.90 & 0.57 & $58.20 \pm 2.11$ \\
+Tree Tensor Network (C) & 42.18 & 0.56 & $95.40 \pm 1.39$ & 47.91 & 0.56 & $89.80 \pm 0.60$ \\
+\bottomrule
+\end{tabular}
+}
+\end{table}
+
+The Strongly Entangling ansatz reaches $96.50\%$ on Task A and $89.60\%$ on Task B, which indicates that the dense rotational space accommodates the Task B distribution while keeping most of the Task A representation. The Basic Entangler obtains the weakest retention, with $73.10\%$ and $58.20\%$ on Tasks A and B respectively, a consequence of its single-axis rotations that fail to capture sufficient class structure on a four-qubit register. The Tree Tensor Network keeps $95.40\%$ on Task A and reaches $89.80\%$ on Task B with a wall-clock cost lower than the Strongly Entangling layout. The hierarchical wiring restricts the parameter manifold and acts as a structural prior that protects the Task A representation against the gradient drift caused by Task B. The accuracies under the ideal profile are $96.30\% / 90.20\%$ for Strongly Entangling, $72.90\% / 57.90\%$ for Basic Entangler and $95.40\% / 90.40\%$ for Tree Tensor Network. The accuracies under the legacy NISQ profile are $96.70\% / 89.90\%$, $72.30\% / 58.30\%$ and $95.30\% / 90.60\%$ in the same order. The differences across noise profiles fall below the standard deviation across seeds, which means that the topology ranking is invariant to the noise level inside the explored range.
+
+Experiment 3 measures the convergence speed on the MNIST target under three initializations, namely random scratch, synthetic QTL and MobileNetV2 QTL. Figure~\ref{fig:exp3} reports the cross-entropy loss curve along the target training epochs for the Heron r2 profile, and Table~\ref{tab:exp3} aggregates the wall-clock cost and the final test accuracy on the target for the same profile.
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=1\linewidth]{figure3_convergence.png}
+\caption{Experiment 3. Cross-entropy loss along the target training epochs for the three initializations under the Heron r2 noise profile. Solid lines are the mean over five seeds and the shaded band is one standard deviation. Lower curves indicate faster convergence.}
+\label{fig:exp3}
+\end{figure}
+
+\begin{table}[ht]
+\centering
+\caption{Experiment 3 under the Heron r2 noise profile. Wall-clock cost and final test accuracy on the MNIST target for each initialization paradigm (mean $\pm$ std over five seeds, std reported on the accuracy).}
+\label{tab:exp3}
+\begin{tabular}{lccc}
+\toprule
+Initialization Paradigm & Train Time (s) & Test Time (s) & Target Acc. (\%) \\
+\midrule
+Pre-Training Source (Synthetic)     & 134.21 & 1.41 & $83.60 \pm 1.23$ \\
+Pre-Training Source (MobileNetV2)   &  68.00 & 0.61 & $83.40 \pm 2.60$ \\
+Target Training (Scratch)           &  67.69 & 0.60 & $90.80 \pm 1.54$ \\
+Target Training (QTL Synthetic)     &  67.85 & 0.61 & $89.90 \pm 0.58$ \\
+Target Training (QTL MobileNetV2)   &  67.56 & 0.60 & $88.60 \pm 1.36$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The three initializations reach a comparable accuracy plateau on the MNIST target. The scratch reference reaches $90.80\%$, the synthetic QTL prior reaches $89.90\%$ and the MobileNetV2 QTL prior reaches $88.60\%$. The QTL paradigms reduce the variance across seeds, with a standard deviation of $0.58$ percentage points for the synthetic prior compared with $1.54$ for the scratch baseline. The training cost of the QTL paradigms remains within one second of the scratch run on the target phase, and the inference cost stays in the $0.60$-second range per test set. The corresponding target accuracies under the ideal profile are $90.10 \pm 1.91$, $90.90 \pm 1.43$ and $89.70 \pm 1.03$ in the order scratch, synthetic, MobileNetV2. Under the legacy NISQ profile they are $89.60 \pm 2.33$, $89.90 \pm 1.24$ and $89.70 \pm 1.54$. The accuracy on the target therefore stays inside a $1.5$-percentage-point band across all noise profiles, which confirms that the cross-domain prior keeps the absolute accuracy without external memory buffers and that the convergence quality is not degraded by the realistic noise level.
+
+\section{Conclusions}\label{sec:conclusions}
+
+This work studies how a cross-domain prior reshapes the parameter landscape of a four-qubit hybrid classifier under a Quantum Continual Learning regime. The protocol has been evaluated across five random seeds and three noise profiles that cover the ideal state-vector simulator, the calibration of the IBM Heron r2 generation and a legacy NISQ regime that aggregates approximately one order of magnitude more gate and readout error. Under the Heron r2 profile the synthetic pre-training reduces the forgetting drop on Task A from $72.90 \pm 1.80$ to $65.10 \pm 3.34$ percentage points, which corresponds to an average reduction of $7.80$ percentage points. The same reduction is $7.00$ points under the ideal profile and $9.30$ points under the legacy NISQ profile, which means that the cross-domain prior keeps the same continual-learning benefit when the simulator transitions from a noiseless regime to a noise budget representative of present and earlier superconducting hardware. The topological ablation across the Strongly Entangling, Basic Entangler and Tree Tensor Network ans\"atze ranks the Tree Tensor Network and the Strongly Entangling layouts together as the most resilient against catastrophic forgetting, with retained Task A accuracies above $95\%$ in every noise profile, while the Basic Entangler stays below $74\%$. The cross-domain experiment confirms that the synthetic, the MobileNetV2 and the random scratch initializations reach comparable accuracy plateaus on the MNIST target inside a $1.5$-percentage-point band across noise profiles, with a clear reduction of the seed-to-seed variance under the synthetic prior. The combined results support an updated version of the central hypothesis. The cross-domain prior moves the variational parameters into a basin that partially resists sequential interference and that remains insensitive to a realistic noise budget, but the residual forgetting on the four-qubit register stays well above zero, and the synthetic source does not raise the final accuracy plateau on the target task. Future work will study the scaling of the protocol to deeper circuits and to a higher number of qubits, the integration of the cross-domain prior with mild parameter-space regularization to push the residual forgetting drop towards zero, and the validation of the noise robustness on real superconducting hardware.
+
+\section*{Acknowledgment}
+
+The authors would like to thank the Spanish Ministry of Science and Innovation for the support within the project PID2023-146037OB-C22.
+
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\end{document}

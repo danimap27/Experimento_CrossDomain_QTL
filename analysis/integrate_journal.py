@@ -216,7 +216,7 @@ arm and {fmt(aa_sy)} for the synthetic prior
 ($\\delta$ = {csync.get('mean_delta', 0):+.2f},
 $p_{{\\text{{Holm}}}}$ = {pstr(csync.get('p_holm'))}, $d_z$ = {fmt(csync.get('dz'))}),
 with average forgetting {fmt(af_sc)} against {fmt(af_sy)} points; the
-regularisation and rehearsal arms land at {fmt(aa_ew)} (EWC) and
+regularization and rehearsal arms land at {fmt(aa_ew)} (EWC) and
 {fmt(aa_er)} (rehearsal) mean accuracy, with
 $\\delta$ = {cer.get('mean_delta', 0):+.2f} ({pstr(cer.get('p_holm'))}) and
 {cewc.get('mean_delta', 0):+.2f} ({pstr(cewc.get('p_holm'))}) against
@@ -237,7 +237,7 @@ arm and Figure~\\ref{{fig:e234_bench5}} the retention of the first task
 along the five phases. The standard class-incremental benchmarks therefore
 do not reproduce the retention advantage that the two-task protocol of
 Experiment~1 attributes to the synthetic prior: the prior remains a
-neutral initialisation at this scale, and the arms that explicitly trade
+neutral initialization at this scale, and the arms that explicitly trade
 plasticity for retention are the only ones that move the retention
 metrics, in the direction and at the plasticity cost already quantified
 in Table~\\ref{{tab:exp1_baselines}}.
@@ -419,16 +419,16 @@ twelve qubits, while the hierarchical wiring decays far more gently, from
 $6.8\\times10^{{-3}}$ to $3.6\\times10^{{-4}}$, keeping about thirty times
 more gradient variance at twelve qubits
 \\cite{{mcclean2018barren,pesah2021absence}}. The checkpoint measurements
-sharpen this into a per-layer statement at the initialisation the two arms
+sharpen this into a per-layer statement at the initialization the two arms
 actually use. At $\\theta_0$, the pre-trained point, the per-layer gradient
 variance of the Task-A loss is
 {lv(sy, 'theta0', 'per_layer_mean')[0]:.2e}, {lv(sy, 'theta0', 'per_layer_mean')[1]:.2e}
 and {lv(sy, 'theta0', 'per_layer_mean')[2]:.2e} for the three ansatz layers
 (mean over layers {x(lv(sy, 'theta0')):.2e}), against
 {lv(sc, 'theta0', 'per_layer_mean')[0]:.2e}, {lv(sc, 'theta0', 'per_layer_mean')[1]:.2e}
-and {lv(sc, 'theta0', 'per_layer_mean')[2]:.2e} at random initialisation
+and {lv(sc, 'theta0', 'per_layer_mean')[2]:.2e} at random initialization
 ({x(lv(sc, 'theta0')):.2e}) --- a gap of three orders of magnitude,
-uniformly across the layers, which means the source optimisation lands the
+uniformly across the layers, which means the source optimization lands the
 circuit in an active, high-gradient region of the landscape rather than the
 weak-gradient region that random rotation angles occupy
 (Figure~\\ref{{fig:e5}}a). After each arm has learned the first task the two
@@ -440,7 +440,7 @@ signature of the interference that the accuracy matrices quantify.
 
 The empirical Fisher spectrum at $\\theta_0$ tells the same story in terms
 of curvature: the trace is {fi(sc, 'theta0')['trace'][0]:.2e} at random
-initialisation against {fi(sy, 'theta0')['trace'][0]:.2e} at the prior
+initialization against {fi(sy, 'theta0')['trace'][0]:.2e} at the prior
 point, with a fuller spectrum (spectral entropy
 {fi(sc, 'theta0')['entropy'][0]:.2f} vs\\ {fi(sy, 'theta0')['entropy'][0]:.2f}
 and effective rank {x(fi(sc, 'theta0')['eff_rank']):.1f} vs\\ {x(fi(sy, 'theta0')['eff_rank']):.1f});
@@ -454,7 +454,7 @@ connected in this parametrisation), and the parameter distance travelled
 is essentially identical
 ($\\|\\theta_B-\\theta_A\\|/\\sqrt{{d}} = {bar(sc, 'dist')[0]:.3f}$ vs\\ {bar(sy, 'dist')[0]:.3f}$).
 Forgetting in this model is therefore not a barrier phenomenon between the
-two solutions; what separates the arms is where the optimisation starts
+two solutions; what separates the arms is where the optimization starts
 relative to both of them (Figure~\\ref{{fig:e5}}c).
 
 Finally, the parameter distributions close an open item of the preliminary
@@ -462,12 +462,12 @@ analysis: the circuit is $2\\pi$-periodic in each rotation angle, which was
 verified numerically --- wrapping the 36 angles of the pre-trained circuit
 reproduces the loss to floating-point precision
 (maximum $|\\Delta\\mathcal{{L}}|$ = {max(p['wrap']['loss_abs_diff'] for p in P['probes']):.1e}).
-Random initialisation covers exactly one period
+Random initialization covers exactly one period
 (uniform in $[0, 2\\pi)$), while the source phase pushes some coordinates
 beyond it (raw range up to about {max(maxraw, abs(minraw)):.1f}
 radians); after wrapping, the effective distributions differ mainly in
 dispersion (standard deviation {wr(sc, 'raw_std')[0]:.2f} for random
-initialisation against {wr(sy, 'raw_std')[0]:.2f} for the prior, with
+initialization against {wr(sy, 'raw_std')[0]:.2f} for the prior, with
 {100 * wr(sc, 'frac_outside_pi')[0]:.0f}\\% and
 {100 * wr(sy, 'frac_outside_pi')[0]:.0f}\\% of the raw angles outside the
 canonical interval). The gradient and curvature evidence above is the part

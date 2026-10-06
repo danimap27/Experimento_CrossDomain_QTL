@@ -3,7 +3,7 @@
 \centering
 \small
 \setlength{\tabcolsep}{3.5pt}
-\caption{Experiment 1 (controlled re-run): continual-learning baselines against the plain scratch arm (B1) and the synthetic-prior arm (B4). $\Delta_A$ is the Task~A forgetting drop in percentage points (lower is better). $p_{\text{Holm}}$ is the two-sided paired $t$-test over seeds after Holm correction within the family of ten baseline contrasts; $d_z$ is the paired Cohen effect size of the contrast against B1 (negative values mean less forgetting than B1). EWC uses the empirical Fisher diagonal computed at the Task~A optimum; Replay and DER++ replay a buffer with 25\% of the Task~A training set.}
+\caption{Experiment 1 (controlled re-run): continual-learning baselines against the plain scratch arm (B1) and the synthetic-prior arm (B4). $\Delta_A$ is the Task~A forgetting drop in percentage points (lower is better). $p_{\text{Holm}}$ is the two-sided paired $t$-test over seeds after Holm correction within the family of ten baseline contrasts. $d_z$ is the paired Cohen effect size of the contrast against B1 (negative values mean less forgetting than B1). EWC uses the empirical Fisher diagonal computed at the Task~A optimum. Replay and DER++ replay a buffer with 25\% of the Task~A training set.}
 \label{tab:exp1_baselines}
 \begin{tabular}{llccc@{\hskip 6pt}ccc}
 \toprule
@@ -12,22 +12,22 @@
 Arm & Method & $\Delta_A$ & $\text{Acc}_A^{\text{final}}$ & $\text{Acc}_B$ & $\delta$ ($p_{\text{Holm}}$) & $d_z$ \\
 \midrule
 \multicolumn{7}{l}{\textit{Ideal (noiseless) ($n=20$ seeds)}} \\
-B1 & scratch & $71.42 \pm 2.79$ & $24.85 \pm 2.78$ & $90.40 \pm 1.70$ & -- & -- \\
+B1 & scratch & $71.42 \pm 2.79$ & $24.85 \pm 2.78$ & $90.40 \pm 1.70$ & n/a & n/a \\
 B5-$10^2$ & EWC $10^2$ & $60.73 \pm 8.34$ & $35.55 \pm 8.14$ & $86.83 \pm 4.27$ & $-10.70$ ($<$0.001) & $-1.21$ \\
 B5-$10^3$ & EWC $10^3$ & $39.25 \pm 17.20$ & $57.02 \pm 16.97$ & $66.85 \pm 11.87$ & $-32.17$ ($<$0.001) & $-1.82$ \\
 B5-$10^4$ & EWC $10^4$ & $2.98 \pm 5.37$ & $93.30 \pm 5.15$ & $31.55 \pm 6.08$ & $-68.45$ ($<$0.001) & $-12.08$ \\
 B6 & Replay & $12.97 \pm 5.62$ & $83.30 \pm 5.52$ & $73.15 \pm 4.03$ & $-58.45$ ($<$0.001) & $-9.60$ \\
 B7 & DER++ & $4.10 \pm 1.99$ & $92.17 \pm 1.89$ & $61.12 \pm 4.26$ & $-67.33$ ($<$0.001) & $-17.44$ \\
-B4 & synth prior & $65.05 \pm 4.78$ & $30.30 \pm 4.67$ & $88.35 \pm 2.03$ & -- & -- \\
+B4 & synth prior & $65.05 \pm 4.78$ & $30.30 \pm 4.67$ & $88.35 \pm 2.03$ & n/a & n/a \\
 \midrule
 \multicolumn{7}{l}{\textit{IBM Heron r2 ($n=20$ seeds)}} \\
-B1 & scratch & $69.67 \pm 3.97$ & $26.27 \pm 3.68$ & $89.92 \pm 2.23$ & -- & -- \\
+B1 & scratch & $69.67 \pm 3.97$ & $26.27 \pm 3.68$ & $89.92 \pm 2.23$ & n/a & n/a \\
 B5-$10^2$ & EWC $10^2$ & $61.42 \pm 9.70$ & $34.52 \pm 9.38$ & $86.62 \pm 4.29$ & $-8.25$ (0.002) & $-0.86$ \\
 B5-$10^3$ & EWC $10^3$ & $41.10 \pm 16.72$ & $54.85 \pm 16.35$ & $70.55 \pm 9.85$ & $-28.57$ ($<$0.001) & $-1.78$ \\
 B5-$10^4$ & EWC $10^4$ & $4.88 \pm 9.50$ & $91.08 \pm 9.24$ & $34.12 \pm 10.09$ & $-64.80$ ($<$0.001) & $-7.24$ \\
 B6 & Replay & $11.75 \pm 5.57$ & $84.20 \pm 5.41$ & $73.03 \pm 3.66$ & $-57.92$ ($<$0.001) & $-9.25$ \\
 B7 & DER++ & $4.03 \pm 1.67$ & $91.92 \pm 1.38$ & $60.85 \pm 3.45$ & $-65.65$ ($<$0.001) & $-16.51$ \\
-B4 & synth prior & $63.58 \pm 4.45$ & $32.25 \pm 4.21$ & $87.80 \pm 2.00$ & -- & -- \\
+B4 & synth prior & $63.58 \pm 4.45$ & $32.25 \pm 4.21$ & $87.80 \pm 2.00$ & n/a & n/a \\
 \bottomrule
 \end{tabular}
 \end{table}

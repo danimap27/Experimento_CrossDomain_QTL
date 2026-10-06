@@ -3,7 +3,7 @@
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\caption{E4 appendix: circuit resources of the trained ansatz (AngleEmbedding $R_x$ + strongly entangling layers + $Z$ readout on wires 0--1), noiseless, and a fault-tolerant cost estimate. \emph{Params} is the number of trainable rotation parameters of the VQC; the classical head adds $2k+k$ parameters for $k$ classes. $T$ is the estimate assuming Ross--Selinger synthesis of each of the $3n_q n_\ell + n_q$ Euler rotations at synthesis error $\varepsilon=10^{-6}$ ($T_{\rm rot}\approx 3\log_2(1/\varepsilon)$); the floor uses the generic single-qubit-gate lower bound of 3 $T$ gates per rotation (Bocharov et al.). CNOTs are Clifford and contribute no $T$ gates.}
+\caption{E4 appendix: circuit resources of the trained ansatz (AngleEmbedding $R_x$ + strongly entangling layers + $Z$ readout on wires 0--1), noiseless, and a fault-tolerant cost estimate. \emph{Params} is the number of trainable rotation parameters of the VQC. the classical head adds $2k+k$ parameters for $k$ classes. $T$ is the estimate assuming Ross--Selinger synthesis of each of the $3n_q n_\ell + n_q$ Euler rotations at synthesis error $\varepsilon=10^{-6}$ ($T_{\rm rot}\approx 3\log_2(1/\varepsilon)$). the floor uses the generic single-qubit-gate lower bound of 3 $T$ gates per rotation (Bocharov et al.). CNOTs are Clifford and contribute no $T$ gates.}
 \label{tab:e4_resources}
 \begin{tabular}{cccccccc}
 \toprule

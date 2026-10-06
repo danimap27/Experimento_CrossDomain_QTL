@@ -3,24 +3,24 @@
 \centering
 \small
 \setlength{\tabcolsep}{4pt}
-\caption{E2 standard class-incremental benchmarks: split-MNIST and split-Fashion-MNIST (5 tasks $\times$ 2 classes, shared head, class-IL evaluation). AA/AF/BWT/FWT follow van de Ven et al. (2022); $\text{Acc}_{t_0}$ is the accuracy on the first task after the whole sequence. $\delta$ (p$_{\text{Holm}}$): paired $t$-test vs.\ scratch on AA, Holm-corrected within each block; $d_z$ paired effect size. Mean $\pm$ SD over seeds.}
+\caption{E2 standard class-incremental benchmarks: split-MNIST and split-Fashion-MNIST (5 tasks $\times$ 2 classes, shared head, class-IL evaluation). AA/AF/BWT/FWT follow van de Ven et al. (2022). $\text{Acc}_{t_0}$ is the accuracy on the first task after the whole sequence. $\delta$ (p$_{\text{Holm}}$): paired $t$-test vs.\ scratch on AA, Holm-corrected within each block. $d_z$ paired effect size. Mean $\pm$ SD over seeds.}
 \label{tab:e234_bench5}
 \begin{tabular}{llccccc@{\hskip 4pt}ccc}
 \toprule
 Bench. & Arm & AA & AF & BWT & FWT & $\text{Acc}_{t_0}$ & $\delta$AA [95\% CI] & $p_{\text{Holm}}$ & $d_z$ \\
 \midrule
 \multicolumn{10}{l}{\textit{split-MNIST (ideal)}} \\
-& scratch & 18.97 & 77.42 & -96.77 & -13.78 & 0.00 & -- & -- & -- \\
+& scratch & 18.97 & 77.42 & -96.77 & -13.78 & 0.00 & n/a & n/a & n/a \\
 & synth & 19.02 & 77.44 & -96.80 & 0.00 & 0.00 & $+0.05$ [$-0.02$, $+0.13$] & $0.240$ & $+0.40$ \\
 & er & 34.45 & 50.40 & -63.00 & -13.78 & 60.52 & $+15.49$ [$+14.73$, $+16.10$] & $<$0.001 & $+13.20$ \\
 & ewc & 17.26 & 74.60 & -93.25 & -13.78 & 0.00 & $-1.71$ [$-2.13$, $-1.28$] & $<$0.001 & $-2.37$ \\
 \midrule
 \multicolumn{10}{l}{\textit{split-MNIST (Heron r2)}} \\
-& scratch & 19.06 & 77.34 & -96.67 & -13.39 & 0.00 & -- & -- & -- \\
+& scratch & 19.06 & 77.34 & -96.67 & -13.39 & 0.00 & n/a & n/a & n/a \\
 & synth & 19.01 & 77.43 & -96.79 & 0.00 & 0.00 & $-0.06$ [$-0.20$, $+0.05$] & $0.480$ & $-0.35$ \\
 \midrule
 \multicolumn{10}{l}{\textit{split-Fashion-MNIST (ideal)}} \\
-& scratch & 19.97 & 77.53 & -96.91 & -10.34 & 0.00 & -- & -- & -- \\
+& scratch & 19.97 & 77.53 & -96.91 & -10.34 & 0.00 & n/a & n/a & n/a \\
 & synth & 20.57 & 76.94 & -96.18 & 0.00 & 0.00 & $+0.59$ [$-0.01$, $+1.51$] & $0.204$ & $+0.43$ \\
 \bottomrule
 \end{tabular}

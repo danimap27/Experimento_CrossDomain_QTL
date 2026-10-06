@@ -22,7 +22,7 @@ Protocol (matches the draft, Section "Statistical protocol"):
     Each family is corrected per noise profile AND pooled across profiles.
   * Acc_A_init / Acc_A_final / Acc_B and retention r_A are reported as
     descriptives per arm (item 2.3); Acc_A_final and Acc_B carry the
-    robustness contrasts labelled as such in the report.
+    robustness contrasts labeled as such in the report.
 """
 
 from __future__ import annotations
@@ -154,7 +154,7 @@ def write_tables(runs, desc):
         "\\setlength{\\tabcolsep}{3.5pt}",
         "\\caption{Experiment 1 (controlled re-run): absolute accuracies and "
         "forgetting for the $2{\\times}2$ design "
-        "(initialisation $\\times$ learning-rate regime), strongly entangling "
+        "(initialization $\\times$ learning-rate regime), strongly entangling "
         "ansatz, four qubits. "
         "$\\text{Acc}_A^{\\text{init}}$: Task~A accuracy after the Task~A phase; "
         "$\\text{Acc}_A^{\\text{final}}$: Task~A accuracy after the Task~B phase; "
@@ -271,7 +271,7 @@ def write_tables(runs, desc):
         "\\footnotesize",
         "\\setlength{\\tabcolsep}{3pt}",
         "\\caption{Experiment 1 (controlled re-run): paired contrasts of the "
-        "$2{\\times}2$ decomposition (initialisation $\\times$ learning-rate "
+        "$2{\\times}2$ decomposition (initialization $\\times$ learning-rate "
         "regime) on the Task~A forgetting drop $\\Delta_A$, in percentage "
         "points (positive values mean more forgetting in the first arm of the "
         "contrast). Significance from a two-sided paired $t$-test over seeds; "
@@ -385,7 +385,7 @@ def main():
                     f"t={c['t']:+.2f}, p={fmt_p(c['p_t'])}, p_holm={fmt_p(c['p_holm'])}, "
                     f"wilcoxon={fmt_p(c['p_wilcoxon'])}, dz={c['dz']:+.2f}, n={c['n']}")
 
-    # ---- robustness on Acc_A_final (labelled exploratory) ------------------
+    # ---- robustness on Acc_A_final (labeled exploratory) ------------------
     report.append("\n## Robustness (exploratory): paired contrasts on Acc_A_final\n")
     summary["robustness"] = {}
     robust = [("B3", "B1", "Init effect (high LR)"), ("B4", "B2", "Init effect (low LR)")]
