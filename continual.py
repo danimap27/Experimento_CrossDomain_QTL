@@ -75,6 +75,98 @@ def ewc_penalty(model, fisher, theta_star, lam):
     return 0.5 * lam * total
 
 
+def l2_penalty(model, anchors, lam):
+    """Uniform L2 drift penalty: lam/2 * sum_anchors sum_i (theta_i - theta*_i)^2.
+
+    `anchors` is a list of `snapshot_params` dicts (every completed task
+    optimum). Returns a zero tensor when the list is empty (first task).
+    """
+    if not anchors:
+        return torch.zeros((), dtype=next(model.parameters()).dtype)
+    total = None
+    for name, p in model.named_parameters():
+        if not p.requires_grad:
+            continue
+        for anchor in anchors:
+            term = ((p - anchor[name].to(p.device)) ** 2).sum()
+            total = term if total is None else total + term
+    return 0.5 * lam * total
+
+
+class SITracker:
+    """Synaptic Intelligence (Zenke et al. 2017) for `train_task`.
+
+    Per-parameter importance is accumulated online during training as the
+    path integral of each weight's contribution to the loss decrease
+    (`pre_step`/`post_step` around every optimisation step), consolidated at
+    the end of every task (`consolidate`), and applied as a quadratic penalty
+    from the second task onwards (`penalty`). First-order gradients only
+    (caveat T1 compliance).
+    """
+
+    def __init__(self, lam: float = 5e3, epsilon: float = 1e-3):
+        self.lam = lam
+        self.epsilon = epsilon
+        self._omega = {}
+        self._w = {}
+        self._prev = {}
+        self._anchor = {}
+        self._n_tasks = 0
+
+    def _ensure_init(self, model):
+        if self._omega:
+            return
+        for n, p in model.named_parameters():
+            if p.requires_grad:
+                self._omega[n] = torch.zeros_like(p)
+                self._w[n] = torch.zeros_like(p)
+                self._prev[n] = p.detach().clone()
+                self._anchor[n] = p.detach().clone()
+
+    def pre_step(self, model):
+        self._ensure_init(model)
+
+    def post_step(self, model):
+        """Accumulate the online contribution w += -grad * delta after a step."""
+        self._ensure_init(model)
+        for n, p in model.named_parameters():
+            if not p.requires_grad or p.grad is None:
+                continue
+            delta = p.detach() - self._prev[n]
+            self._w[n] += -p.grad.detach() * delta
+            self._prev[n] = p.detach().clone()
+
+    def consolidate(self, model):
+        """Fold the task's online contribution into omega and re-anchor."""
+        self._ensure_init(model)
+        for n, p in model.named_parameters():
+            if not p.requires_grad:
+                continue
+            theta_curr = p.detach().clone()
+            change = (theta_curr - self._anchor[n]).pow(2) + self.epsilon
+            self._omega[n] += torch.clamp(self._w[n] / change, min=0)
+            self._w[n].zero_()
+            self._anchor[n] = theta_curr
+            self._prev[n] = theta_curr.clone()
+        self._n_tasks += 1
+
+    def penalty(self, model):
+        if self._n_tasks == 0 or not self._omega:
+            return torch.zeros((), dtype=next(model.parameters()).dtype)
+        total = None
+        for n, p in model.named_parameters():
+            if p.requires_grad and n in self._omega:
+                term = (self._omega[n].to(p.device) *
+                        (p - self._anchor[n].to(p.device)) ** 2).sum()
+                total = term if total is None else total + term
+        if total is None:
+            return torch.zeros((), dtype=next(model.parameters()).dtype)
+        return self.lam * total
+
+    def n_tasks_seen(self) -> int:
+        return self._n_tasks
+
+
 # ---------------------------------------------------------------------------
 # Replay buffer
 # ---------------------------------------------------------------------------
@@ -133,7 +225,7 @@ def evaluate_accuracy(model, loader):
 
 def train_task(model, train_loader, epochs, lr, criterion=None, eval_old_loader=None,
                ewc=None, replay_dataset=None, replay_mode=None, replay_logits=None,
-               beta=0.5, log_prefix=""):
+               beta=0.5, si=None, l2=None, log_prefix=""):
     """Train `model` on one task.
 
     ewc            -- dict(fisher=..., theta_star=..., lam=...) to add the EWC
@@ -143,6 +235,11 @@ def train_task(model, train_loader, epochs, lr, criterion=None, eval_old_loader=
                         replay_mode='er'    -> CE on the rehearsal batch (ER)
                         replay_mode='derpp' -> CE on the rehearsal batch plus
                                                beta * MSE(logits, stored logits)
+    si             -- SITracker instance: runs the per-step synaptic-intensity
+                      hooks around every optimisation step and adds its penalty
+                      from the second task onwards (zero in the first task).
+    l2             -- dict(anchors=[...], lam=...) adding a uniform L2 drift
+                      penalty towards every past-task optimum.
     Returns a history dict with loss curves, timings and per-epoch old-task
     accuracy when `eval_old_loader` is given.
     """
@@ -151,7 +248,7 @@ def train_task(model, train_loader, epochs, lr, criterion=None, eval_old_loader=
     optimizer = torch.optim.Adam(params, lr=lr)
 
     hist = {"loss": [], "loss_task": [], "loss_replay": [], "loss_ewc": [],
-            "epoch_time": [], "old_acc": []}
+            "loss_si": [], "loss_l2": [], "epoch_time": [], "old_acc": []}
 
     replay_loader = None
     if replay_dataset is not None:
@@ -164,7 +261,7 @@ def train_task(model, train_loader, epochs, lr, criterion=None, eval_old_loader=
     start_train = time.time()
     for ep in range(epochs):
         ep_start = time.time()
-        ep_loss = ep_task = ep_rep = ep_ewc = 0.0
+        ep_loss = ep_task = ep_rep = ep_ewc = ep_si = ep_l2 = 0.0
         n_steps = 0
 
         if replay_loader is not None:
@@ -208,19 +305,35 @@ def train_task(model, train_loader, epochs, lr, criterion=None, eval_old_loader=
                     l_ewc = term if l_ewc is None else l_ewc + term
                 loss = loss + l_ewc
 
+            l_si = torch.zeros((), dtype=loss_task.dtype)
+            l_l2 = torch.zeros((), dtype=loss_task.dtype)
+            if l2 is not None:
+                l_l2 = l2_penalty(model, l2.get("anchors") or [], l2["lam"])
+                loss = loss + l_l2
+            if si is not None:
+                l_si = si.penalty(model)
+                loss = loss + l_si
+                si.pre_step(model)
+
             loss.backward()
             optimizer.step()
+            if si is not None:
+                si.post_step(model)
 
             ep_loss += float(loss.detach())
             ep_task += float(loss_task.detach())
             ep_rep += float(l_rep.detach())
             ep_ewc += float(l_ewc.detach())
+            ep_si += float(l_si.detach())
+            ep_l2 += float(l_l2.detach())
             n_steps += 1
 
         hist["loss"].append(ep_loss / max(n_steps, 1))
         hist["loss_task"].append(ep_task / max(n_steps, 1))
         hist["loss_replay"].append(ep_rep / max(n_steps, 1))
         hist["loss_ewc"].append(ep_ewc / max(n_steps, 1))
+        hist["loss_si"].append(ep_si / max(n_steps, 1))
+        hist["loss_l2"].append(ep_l2 / max(n_steps, 1))
         hist["epoch_time"].append(time.time() - ep_start)
 
         if eval_old_loader is not None:

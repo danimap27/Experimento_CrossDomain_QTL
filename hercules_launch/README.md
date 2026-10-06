@@ -39,5 +39,7 @@ ssh hercules-cica 'ls ~/crossdomain_qcl/results/ | grep -c e234'   # celdas comp
 - `launch_all.sh` — relanzador completo (acceso → subida → bootstrap → estado).
 - `bootstrap_compute.sh` — job SLURM que instala todo y envía el array.
 - `slurm_e234c.sh` — plantilla del array (290 celdas, %48 concurrentes).
-- `cmds_e234.txt` — lista de celdas (chain4 + smnist5/sfmnist5 + pair2 escalas
-  + qubits×layers; ideal + heron_r2; sin scifar5 → pendiente decisión CIFAR).
+- `cmds_e6.txt` + `slurm_e6.sh` — **E6** (regularization family): `si`/`l2`/`derpp`
+  on top of {scratch, synth} with two lambdas per penalty method (si: 5/50,
+  l2: 0.2/2; calibrated on this model — the QTCL-scale 5e3 freezes it),
+  100 cells, split-MNIST class-IL with global labels.

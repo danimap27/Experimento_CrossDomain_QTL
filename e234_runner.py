@@ -25,6 +25,13 @@ Protocol (fixed for this campaign, consistent with the E1 controlled design):
     15 epochs, lr 0.05) per cell, identical to E1 (B3 protocol).
   * `er`   = rehearsal with a 25% accumulated reservoir of every past task.
   * `ewc`  = sequential Fisher penalties from every completed task (lam 1e4).
+  * `si`   = synaptic intelligence (Zenke et al. 2017): online importance
+    accumulation with lam 5e3, usable on top of scratch or synth.
+  * `l2`   = uniform L2 drift penalty towards every past-task optimum (lam 5e3).
+  * `derpp` = dark experience replay++: 25% reservoir like `er` plus the
+    stored logits of every buffered chunk (beta 0.5, same recipe as E1/B7).
+  * `synth_si` / `synth_l2` / `synth_derpp` = the same mechanisms initialised
+    from the synthetic prior (init x method grid of the E6 study).
   * `--label-mode global` remaps every task's labels to their global class
     offset (2*i) BEFORE training/evaluation, so the shared multi-class head
     allocates a distinct pair of output units per task: this is the true
@@ -68,6 +75,7 @@ from data_module import DataModule
 from quantum_net import HybridQuantumNet, NOISE_PROFILES, get_noise_profile
 from continual import (
     ReplayBuffer,
+    SITracker,
     empirical_fisher,
     evaluate_accuracy,
     snapshot_params,
@@ -109,8 +117,28 @@ CAMPAIGNS = {
         limits=(2000, 400)),
 }
 
-ARMS = ["scratch", "synth", "er", "ewc"]
+ARMS = ["scratch", "synth", "er", "ewc", "si", "l2", "derpp",
+        "synth_si", "synth_l2", "synth_derpp"]
 PROFILES = ["ideal", "heron_r2"]
+SI_LAM = 5.0                    # synaptic-intelligence penalty (calibrated:
+                                # the QTCL-scale 5e3 freezes this model)
+L2_LAM = 0.2                    # uniform L2 drift penalty (same calibration)
+DERPP_BETA = 0.5                # DER++ logit-matching weight (same as E1)
+
+
+def arm_parts(arm):
+    """Split an arm name into (init, method).
+
+    init   in {scratch, synth}: whether the model starts from the synthetic
+           prior or from a random initialisation.
+    method in {None, 'er', 'ewc', 'si', 'l2'}: the continual-learning
+           mechanism applied on top of the initialisation, keeping every
+           scratch/synth pair comparable under the matched-rate protocol.
+    """
+    if arm.startswith("synth"):
+        method = arm[len("synth_"):] if arm != "synth" else None
+        return "synth", method
+    return "scratch", (None if arm == "scratch" else arm)
 
 
 # ---------------------------------------------------------------------------
@@ -320,6 +348,7 @@ def run_cell(args) -> pathlib.Path | None:
     ncomp = args.n_components or nq
     nl = args.n_layers
     tag = args.tag or "std"
+    cell_init, cell_method = arm_parts(args.arm)
 
     out_dir = (pathlib.Path(args.out_root) /
                f"e234_{args.campaign}__{tag}__{args.arm}__{args.profile}__s{args.seed}")
@@ -382,16 +411,21 @@ def run_cell(args) -> pathlib.Path | None:
             "n_classes": n_classes, "limit_train": limit_train,
             "limit_test": limit_test, "arm": args.arm,
             "label_mode": args.label_mode,
-            "method": {"er": "rehearsal 25% accumulated"}.get(args.arm, args.arm),
-            "ewc_lam": EWC_LAM if args.arm == "ewc" else None,
+            "method": {"er": "rehearsal 25% accumulated",
+                       "derpp": "dark experience replay++ 25% (beta 0.5)",
+                       "si": "synaptic intelligence",
+                       "l2": "uniform L2 drift penalty"}.get(cell_method, cell_method or args.arm),
+            "ewc_lam": EWC_LAM if cell_method == "ewc" else None,
+            "reg_lam": (args.si_lam if cell_method == "si" else
+                        (args.l2_lam if cell_method == "l2" else None)),
             "pretrain": {"samples": PRETRAIN_SAMPLES, "epochs": PRETRAIN_EPOCHS,
-                         "lr": PRETRAIN_LR} if args.arm == "synth" else None,
+                         "lr": PRETRAIN_LR} if cell_init == "synth" else None,
         },
     }
 
     # ---------------- initialisation ----------------
     theta0 = None
-    if args.arm == "synth":
+    if cell_init == "synth":
         set_seed(seed * BASE_SEED + 1)
         src = new_model()
         syn_tr, syn_te = dm.get_synthetic_task(n_samples=args.pretrain_samples)
@@ -416,6 +450,9 @@ def run_cell(args) -> pathlib.Path | None:
     ewc_chain = []
     buffers = []
     replay_all = None
+    si_tracker = SITracker(lam=args.si_lam) if cell_method == "si" else None
+    l2_anchors = [] if cell_method == "l2" else None
+    derpp_z = [] if cell_method == "derpp" else None
 
     for t in range(T):
         # accuracy on task t of the model as it enters task t (b_j)
@@ -424,15 +461,24 @@ def run_cell(args) -> pathlib.Path | None:
 
         set_seed(seed * BASE_SEED + 50 + t)  # identical batch order across arms
         replay_dataset = None
-        if args.arm == "er" and buffers:
+        replay_logits = None
+        if cell_method in ("er", "derpp") and buffers:
             replay_dataset = TensorDataset(
                 torch.cat([b.dataset.tensors[0] for b in buffers]),
                 torch.cat([b.dataset.tensors[1] for b in buffers]))
-        ewc_arg = ewc_chain if (args.arm == "ewc" and ewc_chain) else None
+            if cell_method == "derpp":
+                replay_logits = TensorDataset(
+                    replay_dataset.tensors[0], replay_dataset.tensors[1],
+                    torch.cat(derpp_z))
+        ewc_arg = ewc_chain if (cell_method == "ewc" and ewc_chain) else None
+        l2_arg = {"anchors": l2_anchors, "lam": args.l2_lam} if cell_method == "l2" else None
 
         hist = train_task(model, loaders[t], args.epochs, LR, criterion=criterion,
                           ewc=ewc_arg, replay_dataset=replay_dataset,
-                          replay_mode="er", log_prefix=f"[{args.arm}/T{t}] ")
+                          replay_mode=("derpp" if cell_method == "derpp" else "er"),
+                          replay_logits=replay_logits, beta=DERPP_BETA,
+                          si=si_tracker, l2=l2_arg,
+                          log_prefix=f"[{args.arm}/T{t}] ")
 
         row_cil = eval_matrix_row(model, tests, t, offsets, "cil", 2 * (t + 1))
         row_full = eval_matrix_row(model, tests, t, offsets, "cil", 2 * T)
@@ -449,15 +495,22 @@ def run_cell(args) -> pathlib.Path | None:
             "acc_after": {"cil": row_cil, "til": row_til},
         }
 
-        if args.arm == "ewc":
+        if cell_method == "ewc":
             fisher = empirical_fisher(model, criterion, loaders[t],
                                       max_batches=EWC_MAX_BATCHES)
             ewc_chain.append({"fisher": fisher, "theta_star": snapshot_params(model),
                               "lam": EWC_LAM})
-        if args.arm == "er":
+        if cell_method in ("er", "derpp"):
             gen = torch.Generator().manual_seed(seed * 100 + 7 + t)
-            buffers.append(ReplayBuffer(loaders[t].dataset, fraction=BUFFER_FRACTION,
-                                        rng=gen))
+            buf = ReplayBuffer(loaders[t].dataset, fraction=BUFFER_FRACTION, rng=gen)
+            buffers.append(buf)
+            if cell_method == "derpp":
+                with torch.no_grad():
+                    derpp_z.append(model(buf.dataset.tensors[0]).detach())
+        if cell_method == "si":
+            si_tracker.consolidate(model)
+        if cell_method == "l2":
+            l2_anchors.append(snapshot_params(model))
 
     # ---------------- metrics ----------------
     metrics = {}
@@ -508,6 +561,10 @@ def parse_args():
     ap.add_argument("--epochs", type=int, default=DEFAULT_EPOCHS)
     ap.add_argument("--pretrain-samples", type=int, default=PRETRAIN_SAMPLES)
     ap.add_argument("--pretrain-epochs", type=int, default=PRETRAIN_EPOCHS)
+    ap.add_argument("--si-lam", type=float, default=SI_LAM,
+                    help="synaptic-intelligence penalty strength (arm 'si')")
+    ap.add_argument("--l2-lam", type=float, default=L2_LAM,
+                    help="uniform L2 drift penalty strength (arm 'l2')")
     ap.add_argument("--data-dir", default=str(REPO / "data"))
     ap.add_argument("--cifar-cache", default=str(REPO / "cache" / "cifar_feats"))
     ap.add_argument("--out-root", default=str(REPO / "results"))
