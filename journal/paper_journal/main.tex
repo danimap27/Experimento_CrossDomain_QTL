@@ -58,22 +58,29 @@ which motivates initialisation strategies that leave no memory footprint after
 training. This study characterises one such strategy, where a hybrid
 classical-quantum model is pre-trained on a synthetic Gaussian source that
 shares no semantic content with the target sequence, and the resulting
-parameters are transferred to the sequential phase. Five random seeds and
-three noise profiles, from an ideal state-vector simulation to a legacy
-device-level error budget, support the analysis, and every comparison is
-reported with paired tests, effect sizes and bootstrap confidence intervals.
-The synthetic prior reduces the forgetting drop of the first task by 7.0 to
-9.3 percentage points across the noise profiles, an improvement that is
-nominally significant under the calibrated device profile and becomes
-unambiguous when the fifteen seed pairs are pooled. A corrected reading of the topology
-comparison shows that the architectures with the largest capacity learn the
-first task best and also lose the most, while the most constrained
-architecture retains more only because it never learns the task well. A
-preliminary mechanism analysis based on gradient statistics suggests that the
-synthetic prior places the circuit in a region of the optimisation landscape
-with substantially stronger gradient signal than random initialisation. The
-results are framed as an empirical characterisation, not as a new method, and
-the limitations of the current scale are stated explicitly.
+parameters initialise the sequential phase. A controlled factorial re-run of
+360 training runs separates the contribution of the initialisation from that
+of the optimisation regime, and a benchmark campaign of 290 further runs
+extends the evaluation to class-incremental sequences of up to five tasks,
+qubit counts from four to eight, circuit depths from two to four and data
+budgets from five hundred to twelve thousand samples, under an ideal
+simulation and a calibrated device noise model, with paired tests, effect
+sizes and bootstrap intervals throughout. The controlled evidence relocates
+the effect that the original protocol attributed to the initialisation. The
+apparent reduction of the forgetting drop is carried by the learning-rate
+regime (about five points, $p<0.001$), the synthetic initialisation produces
+no significant change under matched schedules, and the null reading is
+stable across benchmarks, scales and budgets. Mechanism probes show that the
+prior places the circuit in a far more active gradient region (roughly three
+orders of magnitude in the first layer) without a retention gain, so
+gradient signal and continual-learning performance dissociate and the
+separation between arms lies in the starting point rather than in a loss
+barrier. Rehearsal is the only evaluated remedy that improves average
+accuracy on the standard class-incremental benchmarks ($+15.5$ points,
+$p<0.001$), at a quantified cost in plasticity. The results are framed as a
+controlled characterisation of cross-domain pre-training for quantum
+continual learning, not as a new method, and the limitations of the current
+scale are stated explicitly.
 \end{abstract}
 
 \begin{keyword}
@@ -138,21 +145,32 @@ These constraints frame the question of this study: does pre-training a
 hybrid quantum-classical classifier on a synthetic source that shares no
 semantic content with the target tasks produce an initialisation that
 reduces forgetting during later sequential training, and under which
-conditions does the effect hold? The present study addresses the question
-for a four-qubit hybrid model across three circuit topologies and three noise
-profiles, with a statistical protocol built on paired comparisons over seeds.
+conditions does the effect hold? The study answers the question for a
+four-qubit hybrid model across circuit topologies, noise profiles, data
+budgets and qubit counts, with a statistical protocol built on paired
+comparisons over seeds.
 The contributions are the following. First, the cross-domain synthetic
 pre-training setup is formalised for a sequential quantum classifier, with
 the source, the task sequence and the evaluation protocol stated precisely.
-Second, the comparative evaluation is reported with absolute accuracies,
-paired tests, effect sizes and confidence intervals, which corrects two
-reporting defects of the earlier conference version of this study, namely
-the omission of absolute accuracies and a mislabelled retention table.
-Third, a corrected reading of the topology comparison is established, where
-the apparently best-retaining architecture is the one with the least
-capacity. Fourth, first mechanism evidence is provided, through gradient
-variance and landscape probes, for why a synthetic prior changes the
-training dynamics of the circuit. The rest of the manuscript is organised as
+Second, a controlled factorial design separates the effect of the
+initialisation from the effect of the optimisation regime and shows that
+the apparent reduction of the forgetting drop, of about six points under
+the original protocol, is carried by the learning rate, while the
+initialisation itself produces no significant change once rates are
+matched. Third, the null reading of the initialisation is shown to be
+stable across class-incremental benchmarks of up to five tasks, data
+budgets from five hundred to twelve thousand samples and scaling grids
+over qubit counts and depths, and the comparative evaluation is reported
+throughout with absolute accuracies, paired tests, effect sizes and
+confidence intervals, which corrects two reporting defects of the earlier
+conference version of this study, namely the omission of absolute
+accuracies and a mislabelled retention table. Fourth, mechanism evidence
+based on gradient statistics, curvature and loss interpolation locates the
+role of the prior in the geometry of the starting point rather than in
+retention, which bounds what initialisation alone can deliver and
+redirects attention to the components that do act, such as rehearsal,
+whose behaviour under the same protocol is quantified. The rest of the
+manuscript is organised as
 follows. Section~\ref{sec:related} reviews the related literature.
 Section~\ref{sec:background} fixes the scenario definitions and the metrics.
 Section~\ref{sec:methodology} describes the pre-training methodology, the
@@ -1021,9 +1039,9 @@ for either arm (barrier height +0.000 and
 +0.000; the two task solutions are linearly
 connected in this parametrisation), and the parameter distance travelled
 is essentially identical
-($\|\theta_B-\theta_A\|/\sqrt{d} = 1.040$ vs\ 1.063$).
+($\|\theta_B-\theta_A\|/\sqrt{d} = 1.040$ vs.\ $1.063$).
 Forgetting in this model is therefore not a barrier phenomenon between the
-two solutions; what separates the arms is where the optimisation starts
+two solutions. What separates the arms is where the optimisation starts
 relative to both of them (Figure~\ref{fig:e5}c).
 
 Finally, the parameter distributions close an open item of the preliminary
@@ -1063,69 +1081,100 @@ two task optima (fixed 300-sample subsets).}\label{fig:e5}
 % ======================================================================
 
 The results support a precise and bounded reading of synthetic cross-domain
-pre-training. The prior produces a consistent reduction of the forgetting
-drop, of about seven to nine points inside a campaign of five seeds and
-three noise profiles, and the pooled analysis leaves little doubt about the
-sign of the effect. The magnitude, however, is moderate, the residual
-forgetting remains large, and the effect mixes with the reduced learning
-rate of the pre-trained arm in the current design. The early mechanism
-evidence adds a direction to this picture. The pre-trained point is not a
-minimum of the target task, but its gradient signal is an order of magnitude
-stronger than the signal available at random initialisation, and the
-topology probes show that the hierarchical wiring preserves more signal at
-larger qubit counts. A plausible reading, to be tested by the extended
-protocol, is that the synthetic prior replaces the weak-gradient starting
-region of a random circuit with an active region whose updates interfere
-less destructively across tasks.
+pre-training. The controlled factorial re-run redistributes the effect that
+the original protocol attributed to the initialisation. The apparent
+reduction of the forgetting drop, of about six points in the uncontrolled
+comparison, is carried by the learning-rate regime, which accounts for
+about five points under matched schedules, while the synthetic
+initialisation produces no significant change once the rates are matched.
+The benchmark campaign extends the null reading beyond the original
+scenario. The prior does not separate from a random initialisation on the
+class-incremental sequences of up to five tasks, on the split benchmarks of
+MNIST and Fashion-MNIST, along the data budgets from five hundred to twelve
+thousand samples, or on the scaling grid over qubit counts and circuit
+depths. The study therefore answers its motivating question with a
+controlled null result at this scale, supported by an explicit statistical
+protocol and a full record of the per-seed payloads.
 
-Three constraints delimit the scope of the claims. The first is scale. All
-experiments use four qubits and three layers, the sequences contain two
-binary tasks, and the noise profiles, while calibrated on a current device
-generation, produce effects that the current seed count cannot separate from
-each other at the level of the absolute accuracies. The second is the
-evaluation scenario. The protocol implements the task-incremental scenario
-with a known task identity, which is the least demanding of the three
-incremental settings \cite{Ven22}, and the behaviour of the synthetic prior
-under class-incremental evaluation is not yet measured. The third is the
-classical share of the pipeline. The MobileNetV2 feature extraction and the
-principal-component reduction dominate the wall-clock cost of the image
+The mechanism evidence adds a second result. The pre-trained point is not a
+minimum of the target task and not a better starting region in terms of
+retention, yet its gradient signal is roughly three orders of magnitude
+stronger in the first layer than the signal available at a random
+initialisation, and its empirical Fisher spectrum is about two orders of
+magnitude larger. The loss interpolation between the two task optima shows
+no barrier along the linear path, so the separation between the arms lies
+in the starting point rather than in the connectivity of the landscape.
+Taken together, the probes dissociate gradient signal from
+continual-learning performance at this scale, since a starting point with
+far more active gradients does not retain earlier tasks better. This
+dissociation is informative for the design of memory-free strategies
+because it removes gradient strength from the list of candidate mechanisms
+that alone can explain retention.
+
+The component comparison completes the picture in the direction of
+practice. On the standard class-incremental benchmarks, rehearsal is the
+only evaluated remedy that improves average accuracy, with an advantage of
+about fifteen points over a plain sequential baseline, at a quantified
+cost in plasticity, while elastic weight consolidation trades most of its
+plasticity for the retention gains it obtains. The synthetic prior, by
+contrast, behaves as a neutral initialisation under this protocol. For
+practitioners, the operational reading is that memory-free pre-training
+can be used without harm but should not be expected to carry retention,
+and that claims of transfer effects in quantum continual learning should
+be established under a matched optimisation regime before attribution.
+
+Three constraints delimit the scope of the claims. The first is scale. The
+headline experiments use four qubits while the scaling grid reaches eight,
+the sequences contain up to five tasks, and the noise model, while
+calibrated on a current device generation, is simulated rather than
+executed on hardware. The second is the evaluation scenario. The extended
+protocol now covers the class-incremental setting of the classical
+benchmarks \cite{Ven22} alongside the task-incremental setting of the
+original protocol, and the null reading holds in both. The third is the
+classical share of the pipeline. The MobileNetV2 feature extraction and
+the principal-component reduction dominate the wall-clock cost of the image
 sources, which bounds any practical advantage that the quantum head could
 claim in the current configuration.
 
-The extended protocol addresses these constraints along four axes. The
-learning-rate control repeats the first experiment with matched schedules
-and adds an elastic-weight-consolidation arm and a rehearsal arm under the
-same protocol, which separates the contributions of initialisation,
-regularisation and memory. The scenario axis extends the evaluation to
-class-incremental sequences, the standard setting of the classical
-continual-learning benchmarks, and to longer task chains over the split
-variants of MNIST, Fashion-MNIST and CIFAR-10 used by that community. The scale axis sweeps qubit counts and
-circuit depths with a resource accounting of gate counts and depth. The
-mechanism axis completes the landscape characterisation with curvature and
-task-gradient alignment measurements. A hardware validation of the
-pre-trained inference is planned once the simulator matrix is complete.
+Several directions follow from these limits. A validation on physical
+hardware would test whether the dissociation between gradient strength and
+retention survives realistic noise correlations beyond the calibrated
+model. Longer task sequences and stronger feature spaces would probe
+whether the null reading persists as interference accumulates further,
+which the present budgets begin to sketch. Meta-learned initialisations,
+which optimise the starting point for sequential adaptation rather than
+for a single source task, are a natural candidate for a strategy that acts
+where the mechanism probes look, and their evaluation under this protocol
+is left for future work.
 
 % ======================================================================
 \section{Conclusions}
 % ======================================================================
 
 This study characterised cross-domain synthetic pre-training as a
-memory-free initialisation for sequential quantum classifiers. Under a
-four-qubit hybrid model and a three-profile noise budget, the synthetic
-prior reduces the forgetting drop of the first task by seven to nine
-percentage points relative to a random initialisation, with the effect
-nominally significant under the device profile and below 0.001 when the
-fifteen seed pairs are pooled. The corrected reading of the topology comparison shows
-that the apparent retention advantage of the constrained topology reflects
-its inability to learn the first task, and that the two high-capacity
-topologies forget nearly the entire first-task accuracy. The mechanism
-probes indicate that the pre-trained parameters sit in a region of
-substantially stronger gradient signal than random initialisation, which
-motivates the landscape characterisation planned for the extended protocol.
-The current evidence is limited to small circuits and short binary
-sequences, and the effect is moderate in absolute terms, which positions the
-synthetic prior as one component of a memory-free strategy rather than as a
-complete solution to forgetting in near-term quantum learning.
+memory-free initialisation for sequential quantum classifiers through a
+controlled factorial design and a benchmark campaign of 650 training runs.
+The controlled evidence relocates the effect that the original protocol
+attributed to the initialisation. Under matched learning rates the
+synthetic prior produces no significant change in forgetting, while the
+optimisation regime carries a reduction of about five points, and the null
+reading of the initialisation is stable across class-incremental
+benchmarks of up to five tasks, qubit counts from four to eight and data
+budgets from five hundred to twelve thousand samples. The corrected
+reading of the topology comparison further shows that the apparent
+retention advantage of the constrained architecture reflects its limited
+capacity to learn the first task. The mechanism probes show that the prior
+places the circuit in a much more active gradient region without a
+corresponding gain in retention, so gradient signal and continual-learning
+performance dissociate at this scale. Among the evaluated remedies,
+rehearsal is the component with the largest measured benefit on the
+standard benchmarks, at a quantified cost in plasticity. The evidence is
+limited to simulated devices and circuits of at most eight qubits, and the
+classical front-end cost of the pipeline is declared explicitly. The
+practical reading is twofold: claims of transfer effects in quantum
+continual learning must be established under matched optimisation regimes,
+and memory-free initialisation alone does not remove forgetting at this
+scale.
 
 
 \appendix
