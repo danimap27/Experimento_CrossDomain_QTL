@@ -132,7 +132,79 @@ def main() -> None:
         dict(descriptives={f"{a}/{t}": {k: float(np.mean([d[s][k] for s in d]))
                                         for k in METRICS} for (a, t), d in data.items() if d},
              contrasts=f1 + f2 + f3), indent=2))
+    write_table(data, f1, f2)
     print(report)
+
+
+def _pf(x: float) -> str:
+    return "$<0.001$" if x < 0.001 else f"${x:.3f}$"
+
+
+def write_table(data: dict, f1: list, f2: list) -> None:
+    """Emit journal/paper_journal/tables/tab_e6_family.tex from the paired stats."""
+    tex = pathlib.Path(__file__).resolve().parent.parent / "journal" / "paper_journal" / "tables" / "tab_e6_family.tex"
+    r1 = {r["label"]: r for r in f1}
+    r2 = {r["label"]: r for r in f2}
+    h1 = {r["label"]: h for r, h in zip(f1, holm([r["p"] for r in f1]))}
+    h2 = {r["label"]: h for r, h in zip(f2, holm([r["p"] for r in f2]))}
+
+    def row(arm: str, key, ref) -> str:
+        arrs = {k: np.array([data[ref][s][k] for s in sorted(data[ref])]) for k in METRICS}
+        if key is None:
+            diff = "$n/a$ & $n/a$"
+        else:
+            r = r2.get(key, r1.get(key))
+            h = h2.get(key, h1.get(key))
+            diff = (f"${r['d']:+.2f}$ [${r['ci'][0]:+.2f}$, ${r['ci'][1]:+.2f}$] & "
+                    f"{_pf(h)}")
+        return (f"{arm} & ${arrs['aa'].mean():.2f} \\pm {arrs['aa'].std(ddof=1):.2f}$ & "
+                f"${arrs['af'].mean():.2f} \\pm {arrs['af'].std(ddof=1):.2f}$ & "
+                f"${arrs['bwt'].mean():.2f} \\pm {arrs['bwt'].std(ddof=1):.2f}$ & "
+                f"{diff} \\\\")
+
+    body = [
+        row("scratch", None, ("scratch", "std")),
+        row("ewc", "ewc/std - scratch", ("ewc", "std")),
+        row("l2 ($0.2$)", "l2/l2a - scratch", ("l2", "l2a")),
+        row("l2 ($2$)", "l2/l2b - scratch", ("l2", "l2b")),
+        row("si ($5$)", "si/si5 - scratch", ("si", "si5")),
+        row("si ($50$)", "si/si50 - scratch", ("si", "si50")),
+        row("derpp", "derpp/std - scratch", ("derpp", "std")),
+        row("er", "er/std - scratch", ("er", "std")),
+    ]
+    body2 = [
+        row("synth (plain)", "synth - scratch", ("synth", "std")),
+        row("synth\\_si ($5$)", "synth_si5 - si5", ("synth_si", "si5")),
+        row("synth\\_si ($50$)", "synth_si50 - si50", ("synth_si", "si50")),
+        row("synth\\_l2 ($0.2$)", "synth_l2a - l2a", ("synth_l2", "l2a")),
+        row("synth\\_l2 ($2$)", "synth_l2b - l2b", ("synth_l2", "l2b")),
+        row("synth\\_derpp", "synth_derpp - derpp", ("synth_derpp", "std")),
+    ]
+    tex.write_text(HEADER + "\n".join(body) + "\n\\midrule\n"
+                   + INTERACTION_HEADER + "\n".join(body2) + "\n"
+                   + FOOTER)
+    print(f"[table] {tex}")
+
+
+HEADER = (
+    "% Generated from analysis/outputs/e6_stats.json (see analysis/e6_stats.py).\n"
+    "\\begin{table}[ht]\n\\centering\n\\small\n\\setlength{\\tabcolsep}{4pt}\n"
+    "\\caption{E6 on the split-MNIST class-incremental benchmark (ideal profile, ten seeds). "
+    "Top: weight-regularization baselines and memory-based arms, with the paired difference of "
+    "average accuracy against the plain sequential baseline (95\\% bootstrap interval, "
+    "Holm-corrected within the block). Bottom: interaction with the synthetic prior, with the "
+    "paired difference against the same mechanism under random initialization. All values in "
+    "accuracy points, mean $\\pm$ standard deviation over seeds.}\n"
+    "\\label{tab:e6_family}\n"
+    "\\begin{tabular}{lccccc}\n\\toprule\n"
+    "Arm & AA & AF & BWT & $\\Delta$ vs reference & $p_{\\text{Holm}}$ \\\\\n\\midrule\n"
+    "\\multicolumn{6}{l}{\\textit{Regularization family and memory arms ($n=10$)}} \\\\\n"
+)
+INTERACTION_HEADER = (
+    "\\multicolumn{6}{l}{\\textit{Interaction with the synthetic prior ($\\Delta$ vs same method, "
+    "random init)}} \\\\\n"
+)
+FOOTER = "\\bottomrule\n\\end{tabular}\n\\end{table}\n"
 
 
 if __name__ == "__main__":

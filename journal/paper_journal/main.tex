@@ -77,7 +77,10 @@ gradient signal and continual-learning performance dissociate and the
 separation between arms lies in the starting point rather than in a loss
 barrier. Rehearsal is the only evaluated remedy that improves average
 accuracy on the standard class-incremental benchmarks ($+15.5$ points,
-$p<0.001$), at a quantified cost in plasticity. The results are framed as a
+$p<0.001$), at a quantified cost in plasticity, and synaptic intelligence
+is the only weight-regularization baseline that improves over the plain
+model ($+4.1$ points, $p=0.007$) while cutting forgetting by an order of
+magnitude. The results are framed as a
 controlled characterization of cross-domain pre-training for quantum
 continual learning, not as a new method, and the limitations of the current
 scale are stated explicitly.
@@ -168,8 +171,8 @@ accuracies and a mislabeled retention table. Fourth, mechanism evidence
 based on gradient statistics, curvature and loss interpolation locates the
 role of the prior in the geometry of the starting point rather than in
 retention, which bounds what initialization alone can deliver and
-redirects attention to the components that do act, such as rehearsal,
-whose behavior under the same protocol is quantified. The rest of the
+redirects attention to the components that do act, such as rehearsal and
+synaptic intelligence, whose behavior under the same protocol is quantified. The rest of the
 manuscript is organized as
 follows. Section~\ref{sec:related} reviews the related literature.
 Section~\ref{sec:background} fixes the scenario definitions and the metrics.
@@ -895,6 +898,40 @@ ten seeds with one standard-deviation bands.}\label{fig:e234_bench5}
 \input{tables/tab_e234_bench5.tex}
 
 
+\subsection{Regularization family and interaction with the synthetic prior}
+\label{sec:e6_family}
+
+The regularization family closes the comparison on the standard benchmarks.
+Table~\ref{tab:e6_family} reports elastic weight consolidation at the
+campaign strength, uniform L2 drift and synaptic intelligence at two
+penalty strengths each, and the two memory-based arms, all under the same
+protocol. Synaptic intelligence at the lower strength is the only
+weight-regularization baseline that improves average accuracy over the
+plain sequential model, with a paired difference of $+4.07$ points
+($p_{\text{Holm}} = 0.007$), and it does so while reducing average
+forgetting from $77.4$ to $6.8$ points, below every memory-based remedy in
+the comparison. At the higher strength the same algorithm freezes the
+model after the first task, which shows the sensitivity of the family to
+the penalty calibration. Elastic weight consolidation and the uniform L2
+penalty do not beat the plain baseline at either strength, with paired
+differences between $-1.7$ and $-6.7$ points. Dark experience replay
+reproduces the pattern of the two-task protocol on the five-task
+benchmark, with a paired gain of $+11.78$ points ($p_{\text{Holm}} <
+0.001$) behind rehearsal ($+15.49$ points) and ahead of every
+regularization arm.
+
+\input{tables/tab_e6_family.tex}
+
+The lower block of the table crosses every mechanism with the synthetic
+prior. Across the five method-matched contrasts, synthetic against random
+initialization under identical mechanism and penalty strength, the paired
+differences lie between $-1.5$ and $+1.9$ points with no
+$p_{\text{Holm}}$ below $0.18$, and the plain contrast without a mechanism
+reproduces the null of the previous sections. Combining the prior with the
+strongest memory-free penalties therefore leaves the picture unchanged,
+and the synthetic initialization is inert for retention both alone and on
+top of the mechanisms that do act.
+
 \subsection{Data scale: full binary splits and the sample-size curve}
 \label{sec:exp_scale}
 
@@ -1106,11 +1143,15 @@ because it removes gradient strength from the list of candidate mechanisms
 that alone can explain retention.
 
 The component comparison completes the picture in the direction of
-practice. On the standard class-incremental benchmarks, rehearsal is the
-only evaluated remedy that improves average accuracy, with an advantage of
-about fifteen points over a plain sequential baseline, at a quantified
-cost in plasticity, while elastic weight consolidation trades most of its
-plasticity for the retention gains it obtains. The synthetic prior, by
+practice. On the standard class-incremental benchmarks, rehearsal yields the
+largest benefit, with an advantage of about fifteen points over a plain
+sequential baseline, at a quantified cost in plasticity, while elastic
+weight consolidation trades most of its plasticity for the retention
+gains it obtains. Among the weight-regularization baselines, synaptic
+intelligence is the only one that improves over the plain model, with a
+modest gain of about four points and a tenfold reduction of forgetting,
+which places the regularization family behind the memory-based remedies
+in this comparison. The synthetic prior, by
 contrast, behaves as a neutral initialization under this protocol. For
 practitioners, the operational reading is that memory-free pre-training
 can be used without harm but should not be expected to carry retention,
@@ -1162,7 +1203,9 @@ places the circuit in a much more active gradient region without a
 corresponding gain in retention, so gradient signal and continual-learning
 performance dissociate at this scale. Among the evaluated remedies,
 rehearsal is the component with the largest measured benefit on the
-standard benchmarks, at a quantified cost in plasticity. The evidence is
+standard benchmarks, at a quantified cost in plasticity, and synaptic
+intelligence is the only weight-regularization baseline that improves
+over the plain model while reducing forgetting by an order of magnitude. The evidence is
 limited to simulated devices and circuits of at most eight qubits, and the
 classical front-end cost of the pipeline is declared explicitly. The
 practical reading is twofold: claims of transfer effects in quantum

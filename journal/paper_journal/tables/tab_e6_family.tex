@@ -1,0 +1,31 @@
+% Generated from analysis/outputs/e6_stats.json (see analysis/e6_stats.py).
+\begin{table}[ht]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\caption{E6 on the split-MNIST class-incremental benchmark (ideal profile, ten seeds). Top: weight-regularization baselines and memory-based arms, with the paired difference of average accuracy against the plain sequential baseline (95\% bootstrap interval, Holm-corrected within the block). Bottom: interaction with the synthetic prior, with the paired difference against the same mechanism under random initialization. All values in accuracy points, mean $\pm$ standard deviation over seeds.}
+\label{tab:e6_family}
+\begin{tabular}{lccccc}
+\toprule
+Arm & AA & AF & BWT & $\Delta$ vs reference & $p_{\text{Holm}}$ \\
+\midrule
+\multicolumn{6}{l}{\textit{Regularization family and memory arms ($n=10$)}} \\
+scratch & $18.97 \pm 0.14$ & $77.42 \pm 0.37$ & $-96.77 \pm 0.47$ & $n/a$ & $n/a$ \\
+ewc & $17.26 \pm 0.62$ & $74.60 \pm 1.07$ & $-93.25 \pm 1.33$ & $-1.71$ [$-2.12$, $-1.27$] & $<0.001$ \\
+l2 ($0.2$) & $12.23 \pm 1.94$ & $31.70 \pm 9.32$ & $-39.62 \pm 11.65$ & $-6.73$ [$-7.84$, $-5.63$] & $<0.001$ \\
+l2 ($2$) & $14.29 \pm 4.36$ & $5.96 \pm 4.19$ & $-7.44 \pm 5.23$ & $-4.67$ [$-7.27$, $-2.19$] & $0.008$ \\
+si ($5$) & $23.03 \pm 3.30$ & $6.81 \pm 4.38$ & $-8.51 \pm 5.47$ & $+4.07$ [$+2.15$, $+5.97$] & $0.007$ \\
+si ($50$) & $19.95 \pm 0.04$ & $0.01 \pm 0.03$ & $-0.02 \pm 0.03$ & $+0.98$ [$+0.89$, $+1.09$] & $<0.001$ \\
+derpp & $30.74 \pm 1.63$ & $27.41 \pm 2.93$ & $-34.27 \pm 3.66$ & $+11.78$ [$+10.75$, $+12.67$] & $<0.001$ \\
+er & $34.45 \pm 1.12$ & $50.40 \pm 3.26$ & $-63.00 \pm 4.07$ & $+15.49$ [$+14.73$, $+16.10$] & $<0.001$ \\
+\midrule
+\multicolumn{6}{l}{\textit{Interaction with the synthetic prior ($\Delta$ vs same method, random init)}} \\
+synth (plain) & $19.02 \pm 0.14$ & $77.44 \pm 0.29$ & $-96.80 \pm 0.36$ & $+0.05$ [$-0.02$, $+0.13$] & $0.962$ \\
+synth\_si ($5$) & $22.16 \pm 4.40$ & $25.91 \pm 10.66$ & $-32.39 \pm 13.32$ & $-0.87$ [$-5.03$, $+2.95$] & $1.000$ \\
+synth\_si ($50$) & $18.43 \pm 1.85$ & $18.82 \pm 1.69$ & $-23.53 \pm 2.11$ & $-1.51$ [$-2.49$, $-0.33$] & $0.181$ \\
+synth\_l2 ($0.2$) & $11.45 \pm 5.30$ & $8.57 \pm 5.27$ & $-10.71 \pm 6.59$ & $-0.79$ [$-4.58$, $+3.08$] & $1.000$ \\
+synth\_l2 ($2$) & $16.14 \pm 3.86$ & $3.81 \pm 3.87$ & $-4.76 \pm 4.84$ & $+1.85$ [$-2.52$, $+5.91$] & $1.000$ \\
+synth\_derpp & $29.39 \pm 1.22$ & $18.53 \pm 1.78$ & $-23.17 \pm 2.22$ & $-1.35$ [$-2.33$, $-0.33$] & $0.181$ \\
+\bottomrule
+\end{tabular}
+\end{table}
