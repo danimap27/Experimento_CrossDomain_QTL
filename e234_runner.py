@@ -111,6 +111,12 @@ CAMPAIGNS = {
                ("fashion_mnist", (4, 5)), ("fashion_mnist", (6, 7)),
                ("fashion_mnist", (8, 9))],
         limits=(12000, 2000)),
+    "smnist10": dict(
+        tasks=[("mnist", (k,)) for k in range(10)],
+        limits=(12000, 2000)),
+    "fmnist10": dict(
+        tasks=[("fashion_mnist", (k,)) for k in range(10)],
+        limits=(12000, 2000)),
     "scifar5": dict(
         tasks=[("cifar10", (0, 1)), ("cifar10", (2, 3)), ("cifar10", (4, 5)),
                ("cifar10", (6, 7)), ("cifar10", (8, 9))],
@@ -285,19 +291,20 @@ def dataset_size(loader) -> int:
 # ---------------------------------------------------------------------------
 
 @torch.no_grad()
-def eval_on_task(model, loader, offset, mode, seen_max):
+def eval_on_task(model, loader, offset, width, mode, seen_max):
     """Accuracy (%) of the model on one task's test set.
 
-    mode='til'  -> argmax restricted to the task's two classes (task oracle)
+    mode='til'  -> argmax restricted to the task's own classes (task oracle)
     mode='cil'  -> argmax over classes [0, seen_max) (class-IL, seen so far)
-    labels `y` are global (offset + 0/1).
+    labels `y` are global (offset + local index); `width` is the number of
+    classes of the task (2 for the standard pairs, 1 for single-class chains).
     """
     model.eval()
     correct, total = 0, 0
     for X, y in loader:
         logits = model(X)
         if mode == "til":
-            local = logits[:, offset:offset + 2]
+            local = logits[:, offset:offset + width]
             preds = local.argmax(dim=1) + offset
         else:
             masked = logits.clone()
@@ -309,8 +316,8 @@ def eval_on_task(model, loader, offset, mode, seen_max):
     return 100.0 * correct / max(total, 1)
 
 
-def eval_matrix_row(model, loaders, t, offsets, mode, seen_max):
-    return [eval_on_task(model, loaders[j], offsets[j], mode, seen_max)
+def eval_matrix_row(model, loaders, t, offsets, widths, mode, seen_max):
+    return [eval_on_task(model, loaders[j], offsets[j], widths[j], mode, seen_max)
             for j in range(t + 1)]
 
 
@@ -364,6 +371,15 @@ def run_cell(args) -> pathlib.Path | None:
     T = len(tasks)
     n_classes = 2 * T
     offsets = [2 * i for i in range(T)]
+    if any(len(classes) != 2 for (_ds, classes) in tasks):
+        widths = [len(classes) for (_ds, classes) in tasks]
+        offsets, _acc = [], 0
+        for _w in widths:
+            offsets.append(_acc)
+            _acc += _w
+        n_classes = _acc
+    else:
+        widths = [2] * T
 
     # ---------------- data ----------------
     dm = DataModule(data_dir=args.data_dir, batch_size=32, n_components=ncomp)
@@ -384,7 +400,7 @@ def run_cell(args) -> pathlib.Path | None:
             for ld in (loaders[i], tests[i]):
                 ds_ = ld.dataset
                 X_, y_ = ds_.tensors
-                ds_.tensors = (X_, y_ + 2 * i)
+                ds_.tensors = (X_, y_ + offsets[i])
 
     model_kwargs = dict(ansatz="A", n_qubits=nq, n_layers=nl, n_classes=n_classes,
                         noise=noise, noise_params=noise_params)
@@ -415,7 +431,8 @@ def run_cell(args) -> pathlib.Path | None:
                        "derpp": "dark experience replay++ 25% (beta 0.5)",
                        "si": "synaptic intelligence",
                        "l2": "uniform L2 drift penalty"}.get(cell_method, cell_method or args.arm),
-            "ewc_lam": EWC_LAM if cell_method == "ewc" else None,
+            "ewc_lam": args.ewc_lam if cell_method == "ewc" else None,
+            "buffer_frac": args.buffer_frac if cell_method in ("er", "derpp") else None,
             "reg_lam": (args.si_lam if cell_method == "si" else
                         (args.l2_lam if cell_method == "l2" else None)),
             "pretrain": {"samples": PRETRAIN_SAMPLES, "epochs": PRETRAIN_EPOCHS,
@@ -440,8 +457,8 @@ def run_cell(args) -> pathlib.Path | None:
         model.load_state_dict(theta0)
 
     # initial-model accuracy on every task (FWT b0)
-    b0_cil = [eval_on_task(model, tests[j], offsets[j], "cil", 2 * T) for j in range(T)]
-    b0_til = [eval_on_task(model, tests[j], offsets[j], "til", 2 * T) for j in range(T)]
+    b0_cil = [eval_on_task(model, tests[j], offsets[j], widths[j], "cil", n_classes) for j in range(T)]
+    b0_til = [eval_on_task(model, tests[j], offsets[j], widths[j], "til", n_classes) for j in range(T)]
 
     # ---------------- sequential training ----------------
     matrices = {m: [[None] * T for _ in range(T)] for m in ("cil", "cil_full", "til")}
@@ -456,8 +473,8 @@ def run_cell(args) -> pathlib.Path | None:
 
     for t in range(T):
         # accuracy on task t of the model as it enters task t (b_j)
-        before["cil"][t] = eval_on_task(model, tests[t], offsets[t], "cil", 2 * T)
-        before["til"][t] = eval_on_task(model, tests[t], offsets[t], "til", 2 * T)
+        before["cil"][t] = eval_on_task(model, tests[t], offsets[t], widths[t], "cil", n_classes)
+        before["til"][t] = eval_on_task(model, tests[t], offsets[t], widths[t], "til", n_classes)
 
         set_seed(seed * BASE_SEED + 50 + t)  # identical batch order across arms
         replay_dataset = None
@@ -480,9 +497,9 @@ def run_cell(args) -> pathlib.Path | None:
                           si=si_tracker, l2=l2_arg,
                           log_prefix=f"[{args.arm}/T{t}] ")
 
-        row_cil = eval_matrix_row(model, tests, t, offsets, "cil", 2 * (t + 1))
-        row_full = eval_matrix_row(model, tests, t, offsets, "cil", 2 * T)
-        row_til = eval_matrix_row(model, tests, t, offsets, "til", 2 * T)
+        row_cil = eval_matrix_row(model, tests, t, offsets, widths, "cil", offsets[t] + widths[t])
+        row_full = eval_matrix_row(model, tests, t, offsets, widths, "cil", n_classes)
+        row_til = eval_matrix_row(model, tests, t, offsets, widths, "til", n_classes)
         for j in range(t + 1):
             matrices["cil"][t][j] = row_cil[j]
             matrices["cil_full"][t][j] = row_full[j]
@@ -499,10 +516,10 @@ def run_cell(args) -> pathlib.Path | None:
             fisher = empirical_fisher(model, criterion, loaders[t],
                                       max_batches=EWC_MAX_BATCHES)
             ewc_chain.append({"fisher": fisher, "theta_star": snapshot_params(model),
-                              "lam": EWC_LAM})
+                              "lam": args.ewc_lam})
         if cell_method in ("er", "derpp"):
             gen = torch.Generator().manual_seed(seed * 100 + 7 + t)
-            buf = ReplayBuffer(loaders[t].dataset, fraction=BUFFER_FRACTION, rng=gen)
+            buf = ReplayBuffer(loaders[t].dataset, fraction=args.buffer_frac, rng=gen)
             buffers.append(buf)
             if cell_method == "derpp":
                 with torch.no_grad():
@@ -565,6 +582,10 @@ def parse_args():
                     help="synaptic-intelligence penalty strength (arm 'si')")
     ap.add_argument("--l2-lam", type=float, default=L2_LAM,
                     help="uniform L2 drift penalty strength (arm 'l2')")
+    ap.add_argument("--ewc-lam", type=float, default=EWC_LAM,
+                    help="EWC penalty strength (arm 'ewc')")
+    ap.add_argument("--buffer-frac", type=float, default=BUFFER_FRACTION,
+                    help="rehearsal reservoir fraction (arms 'er'/'derpp')")
     ap.add_argument("--data-dir", default=str(REPO / "data"))
     ap.add_argument("--cifar-cache", default=str(REPO / "cache" / "cifar_feats"))
     ap.add_argument("--out-root", default=str(REPO / "results"))
