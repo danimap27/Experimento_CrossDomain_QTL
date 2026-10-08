@@ -88,7 +88,7 @@ class HybridQuantumNet(nn.Module):
 
     def __init__(self, ansatz='A', n_qubits=4, n_layers=2, noise=False,
                  noise_params=None, n_classes=2, n_readout=2,
-                 ttn_readout='limited'):
+                 ttn_readout='limited', device=None, diff_method=None):
         super(HybridQuantumNet, self).__init__()
         if n_qubits < 2:
             raise ValueError("n_qubits must be >= 2")
@@ -102,10 +102,16 @@ class HybridQuantumNet(nn.Module):
         self.n_classes = n_classes
         self.n_readout = n_readout
         self.ttn_readout = ttn_readout
+        self.diff_method = diff_method
 
-        # Mixed-state simulator required for depolarizing channels
+        # Mixed-state simulator required for depolarizing channels.
+        # `default.qubit` is the conservative default; `lightning.qubit` is
+        # the exact C++ statevector backend (identical math, much faster for
+        # >=12 qubits) and can be selected explicitly with `device=`.
         if self.noise:
             self.dev = qml.device("default.mixed", wires=n_qubits)
+        elif device:
+            self.dev = qml.device(device, wires=n_qubits)
         else:
             self.dev = qml.device("default.qubit", wires=n_qubits)
 
@@ -216,7 +222,11 @@ class HybridQuantumNet(nn.Module):
 
     # ------------------------------------------------------------------
     def _qnode(self):
-        @qml.qnode(self.dev, interface="torch")
+        qnode_kwargs = dict(interface="torch")
+        if self.diff_method:
+            qnode_kwargs["diff_method"] = self.diff_method
+
+        @qml.qnode(self.dev, **qnode_kwargs)
         def circuit(inputs, weights):
             # 1. Encoding
             qml.AngleEmbedding(inputs, wires=range(self.n_qubits))

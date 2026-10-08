@@ -403,7 +403,8 @@ def run_cell(args) -> pathlib.Path | None:
                 ds_.tensors = (X_, y_ + offsets[i])
 
     model_kwargs = dict(ansatz="A", n_qubits=nq, n_layers=nl, n_classes=n_classes,
-                        noise=noise, noise_params=noise_params)
+                        noise=noise, noise_params=noise_params, device=args.device,
+                        diff_method=args.diff_method)
     criterion = nn.CrossEntropyLoss()
 
     def new_model():
@@ -426,6 +427,7 @@ def run_cell(args) -> pathlib.Path | None:
             "n_qubits": nq, "n_components": ncomp, "n_layers": nl, "ansatz": "A",
             "n_classes": n_classes, "limit_train": limit_train,
             "limit_test": limit_test, "arm": args.arm,
+            "device": args.device or "default.qubit",
             "label_mode": args.label_mode,
             "method": {"er": "rehearsal 25% accumulated",
                        "derpp": "dark experience replay++ 25% (beta 0.5)",
@@ -582,6 +584,13 @@ def parse_args():
                     help="synaptic-intelligence penalty strength (arm 'si')")
     ap.add_argument("--l2-lam", type=float, default=L2_LAM,
                     help="uniform L2 drift penalty strength (arm 'l2')")
+    ap.add_argument("--device", default=None,
+                    help="PennyLane device for the ideal simulation, e.g. "
+                         "'lightning.qubit' (exact C++ statevector); default: default.qubit")
+    ap.add_argument("--diff-method", default=None,
+                    help="PennyLane differentiation method for the qnode, e.g. "
+                         "'adjoint' (O(1) gradients, independent of parameter "
+                         "count; much faster for >=12 qubits)")
     ap.add_argument("--ewc-lam", type=float, default=EWC_LAM,
                     help="EWC penalty strength (arm 'ewc')")
     ap.add_argument("--buffer-frac", type=float, default=BUFFER_FRACTION,
