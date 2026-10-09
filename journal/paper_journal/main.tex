@@ -932,6 +932,32 @@ strongest memory-free penalties therefore leaves the picture unchanged,
 and the synthetic initialization is inert for retention both alone and on
 top of the mechanisms that do act.
 
+\subsection{Longer task chains}
+\label{sec:longer_chains}
+
+The scenario and benchmark campaigns were complemented with ten-task chains, one class per
+task, on split-MNIST and split-Fashion-MNIST, to test whether the ranking of strategies
+survives longer sequences. Table~\ref{tab:e7_chains} reports the average accuracy and
+average forgetting of the same arms under the same protocol. The plain model collapses to
+the ten-class chance level, with a forgetting of $89.99$ points, and the synthetic prior
+does not change it, with a paired difference of $+0.03$ points. The memory-based arms keep
+a significant advantage. Rehearsal gains $+5.68$ points and dark experience replay $+8.45$
+points on split-MNIST (Holm-corrected $p < 0.001$ in both cases), and both gains reproduce
+on split-Fashion-MNIST at $+7.28$ and $+8.77$ points. Synaptic intelligence preserves its
+low-forgetting profile, $8.35$ points against $89.99$ of the plain model, but its accuracy
+advantage dilutes without significance, $+1.08$ points at the chosen strength and $+0.66$
+and $+0.76$ points at the weaker ones, while elastic weight consolidation stays at the
+plain level at both tested strengths, $ -0.06$ and $-0.00$ points. The hyperparameter
+probes of the same campaign confirm the insensitivity of the family. Doubling the rehearsal
+buffer from twenty-five to fifty percent changes nothing measurable, $+0.22$ points against
+the smaller buffer, and the elastic-weight penalty does not recover its deficit either, as
+it did not on the five-task benchmarks. Longer chains therefore sharpen the reading of the
+previous sections. The memory-free remedies do not carry retention when interference
+accumulates over ten tasks, and the arms with an explicit memory are the only components
+that improve it.
+
+\input{tables/tab_e7_chains.tex}
+
 \subsection{Data scale: full binary splits and the sample-size curve}
 \label{sec:exp_scale}
 
@@ -1014,6 +1040,27 @@ per epoch on one CPU core.}\label{fig:e234_scaling}
 
 
 
+
+\subsection{Capacity curve on the standard benchmarks}
+\label{sec:capacity_curve}
+
+The scaling grid of the previous section uses the two-task protocol. Table~\ref{tab:e89_capacity}
+extends the sweep to the class-incremental benchmarks and to larger circuits, with the number
+of qubits equal to the number of principal components of the encoding. Two effects carry
+decision weight. First, input capacity converts into accuracy only when a retention mechanism
+is present. From four to eight qubits the memory-based arms improve significantly, with paired
+gains of $+5.9$ points for rehearsal and $+4.0$ points for dark experience replay on the
+five-task chain and $+4.8$ and $+2.9$ points on the ten-task chain, while the plain model does
+not move and its forgetting stays at the level of the ten-task collapse. Second, the benefit
+saturates. Twelve qubits do not separate from eight in any arm, with paired differences of
+$-1.0$, $+0.6$ and $-0.1$ points for rehearsal, dark experience replay and the plain model,
+so the eight-qubit circuit is the largest size that pays off and the twelve-qubit cells mark
+a plateau rather than a further gain. Larger circuits leave classical state-vector simulation,
+sixteen qubits cost about forty-four seconds per optimisation step and thirty-two qubits
+require a state vector of sixty-nine gigabytes, and their discussion belongs with the
+fault-tolerant resource ladder of Appendix~\ref{app:resources}.
+
+\input{tables/tab_e89_capacity.tex}
 
 \subsection{Mechanism analysis}
 \label{sec:mechanism}
