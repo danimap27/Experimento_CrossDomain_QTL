@@ -8,6 +8,9 @@ writes into journal/paper_journal/figures/:
                           class-IL matrices for scratch and synth.
   fig_e234_bench5.pdf     E2 standard benchmarks: split-MNIST retention
                           curves + AA/AF + split-FMNIST curves (+Nemenyi CD).
+  fig_e234_remedies.pdf   the four benchmark arms' class-IL accuracy matrices
+                          on split-MNIST (forgetting versus retention at a
+                          glance, for readers and automated reviewers).
   fig_e234_scale.pdf      E3 data scale: AA / dA / AccB vs train size.
   fig_e234_scaling.pdf    E4 grid: dA / AA / epoch time vs config.
 
@@ -318,12 +321,55 @@ def fig_scaling(runs: Runs):
                capsize=2, color=COL[arm], edgecolor="black", linewidth=0.5, label=arm)
     ax.set_xticks(xs, [c for c, _ in configs])
     ax.set_ylabel("seconds per epoch")
-    ax.set_title("(c) per-epoch wall-clock")
+    ax.set_title("(c) per-epoch elapsed time")
     ax.grid(axis="y", ls="--", alpha=0.5)
     ax.legend(frameon=False, fontsize=8)
 
     fig.tight_layout()
     out = FIGDIR / "fig_e234_scaling.pdf"
+    fig.savefig(out)
+    plt.close(fig)
+    print(f"figure written: {out}")
+
+
+def fig_remedies(runs: Runs):
+    """Class-IL accuracy matrices of the four benchmark arms (split-MNIST).
+
+    One panel per arm, shared colour scale, so the difference between the
+    losing arms and rehearsal is visible at a glance.
+    """
+    arms = [a for a in ("scratch", "synth", "er", "ewc")
+            if runs.seeds("smnist5", "std", "ideal", a)]
+    if len(arms) < 2:
+        return
+    T = 5
+    fig = plt.figure(figsize=(3.3 * len(arms), 3.7), constrained_layout=True)
+    gs = fig.add_gridspec(1, len(arms))
+    cmap = plt.get_cmap("viridis").copy()
+    cmap.set_bad("#e8e8e8")  # not-yet-evaluated cells: neutral grey, not a 0.0
+    for j, arm in enumerate(arms):
+        ax = fig.add_subplot(gs[0, j])
+        per = [p["metrics"]["cil"]["matrix"]
+               for p in runs.seeds("smnist5", "std", "ideal", arm).values()]
+        M = np.full((T, T), np.nan)
+        for mat in per:
+            for i, row in enumerate(mat):
+                for k, v in enumerate(row):
+                    M[i, k] = np.nanmean([M[i, k], v])
+        im = ax.imshow(M, vmin=0, vmax=100, cmap=cmap)
+        ax.set_xticks(range(T), [f"T{i+1}" for i in range(T)], fontsize=8)
+        ax.set_yticks(range(T), [f"after T{i+1}" for i in range(T)], fontsize=8)
+        aa = np.nanmean(M[T-1, :])
+        ax.set_title(f"{arm} (AA {aa:.1f})", fontsize=10)
+        for i in range(T):
+            for k in range(i + 1):
+                v = M[i, k]
+                ax.text(k, i, f"{v:.0f}", ha="center", va="center",
+                        color="white" if v < 60 else "black", fontsize=7)
+        if j == len(arms) - 1:
+            cbar = fig.colorbar(im, ax=ax, fraction=0.046, pad=0.03)
+            cbar.set_label("accuracy (%)", fontsize=8)
+    out = FIGDIR / "fig_e234_remedies.pdf"
     fig.savefig(out)
     plt.close(fig)
     print(f"figure written: {out}")
@@ -336,6 +382,7 @@ def main():
     print(f"loaded {len(payloads)} cells ({len(missing)} missing)")
     fig_scenarios(runs)
     fig_bench5(runs)
+    fig_remedies(runs)
     fig_scale(runs)
     fig_scaling(runs)
 

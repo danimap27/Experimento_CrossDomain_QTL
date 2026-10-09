@@ -8,8 +8,10 @@ Rules, all of them checked outside LaTeX comments and outside math mode:
 3. No bold inside the main sections (between the introduction and the conclusion).
 4. No itemized or enumerated lists inside the main sections.
 5. No acronyms in the abstract (a run of two or more capitals outside math).
-6. Every ``\\\\cite`` key must exist in the bibliography file.
-7. Every ``\\\\input`` path must exist relative to the manuscript directory.
+6. No engineering jargon such as ``wall-clock`` or ``wall time``
+   (use *elapsed time*, *processing time* or *running time*).
+7. Every ``\\\\cite`` key must exist in the bibliography file.
+8. Every ``\\\\input`` path must exist relative to the manuscript directory.
 
 Usage
 -----
@@ -113,6 +115,12 @@ def lint(text: str, bib_path: Optional[pathlib.Path] = None, tex_path: Optional[
                 if acronym in ACRONYM_ALLOWLIST:
                     continue
                 report(number, "no-acronyms-in-abstract", f"acronym {acronym!r} in the abstract")
+
+        lowered = prose.lower()
+        for term in ("wall-clock", "wall clock", "wallclock"):
+            if term in lowered:
+                report(number, "no-jargon-terms",
+                       f"engineering jargon {term!r} in prose (use 'elapsed time' or 'processing time')")
 
         citation = CITE_PATTERN.search(line)
         if citation:

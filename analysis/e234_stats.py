@@ -449,7 +449,7 @@ def write_scaling_table(runs: Runs, out):
         "{2, 3, 4} (PCA dimension matched to the qubit count). "
         "$\\Delta_A$ (Task-A drop of the shared binary readout), AA and "
         "$\\text{Acc}_B$; $t_{\\text{ep}}$ "
-        "is the mean wall-clock per epoch (one CPU core, PennyLane "
+        "is the mean elapsed time per epoch (one CPU core, PennyLane "
         "state-vector). $\\delta\\Delta_A$ (p$_{\\text{Holm}}$): paired "
         "synth$-$scratch $t$-test, Holm within the five-config family; "
         "$d_z$ paired effect size. Mean over seeds.",

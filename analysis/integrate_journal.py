@@ -347,7 +347,7 @@ every configuration
 4q/4L {c_l4.get('mean_delta', 0):+.2f}, {pstr(c_l4.get('p_holm'))}).
 Adding qubits at fixed depth and changing depth at four qubits leave both
 the accuracy level and the forgetting profile within the seed spread
-(Figure~\\ref{{fig:e234_scaling}}), while the per-epoch wall-clock grows
+(Figure~\\ref{{fig:e234_scaling}}), while the per-epoch elapsed time grows
 by roughly a factor of {fmt(e4_ratio, 1)}
 from four to eight qubits at fixed depth, consistent with the
 state-vector simulation cost. The resource accounting of the same grid ---
@@ -365,7 +365,7 @@ the two-task binary setting rather than a generic property of the method.
 \\centering
 \\includegraphics[width=\\linewidth]{{figures/fig_e234_scaling.pdf}}
 \\caption{{E4 scaling grid (ideal profile, ten seeds). (a) Task-A forgetting
-drop and (b) mean accuracy for the five configurations; (c) mean wall-clock
+drop and (b) mean accuracy for the five configurations; (c) mean elapsed time
 per epoch on one CPU core.}}\\label{{fig:e234_scaling}}
 \\end{{figure}}
 

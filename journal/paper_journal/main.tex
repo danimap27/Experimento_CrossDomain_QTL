@@ -66,7 +66,7 @@ qubit counts from four to eight, circuit depths from two to four and data
 budgets from five hundred to twelve thousand samples, under an ideal
 simulation and a calibrated device noise model, with paired tests, effect
 sizes and bootstrap intervals throughout. The controlled evidence relocates
-the effect that the original protocol attributed to the initialization. The
+the effect that the original protocol ascribed to the initialization. The
 apparent reduction of the forgetting drop is carried by the learning-rate
 regime (about five points, $p<0.001$), the synthetic initialization produces
 no significant change under matched schedules, and the null reading is
@@ -137,8 +137,8 @@ quantum circuits to operate on high-dimensional inputs \cite{mari2020transfer,
 martinperez2026cmes, martinperez2026soco}. The transfer-learning literature
 in the classical setting has long recognised that pre-training on data
 unrelated to the target domain still produces features that transfer well
-\cite{Yosinski14, pan2009survey}. Whether the same logic holds
-for a variational circuit in a sequential setting, and what property of the
+\cite{Yosinski14, pan2009survey}. Whether the same logic applies
+to a variational circuit in a sequential setting, and what property of the
 resulting initialization protects later tasks, remains open. The observation
 that layerwise initialization strategies stabilise the training of quantum
 circuits \cite{Skolik21} indicates that the starting point of a
@@ -148,7 +148,7 @@ These constraints frame the question of this study: does pre-training a
 hybrid quantum-classical classifier on a synthetic source that shares no
 semantic content with the target tasks produce an initialization that
 reduces forgetting during later sequential training, and under which
-conditions does the effect hold? The study answers the question for a
+conditions does the effect persist? The study answers the question for a
 four-qubit hybrid model across circuit topologies, noise profiles, data
 budgets and qubit counts, with a statistical protocol built on paired
 comparisons over seeds.
@@ -193,7 +193,7 @@ The sequential-learning problem was formalised by
 McCloskey and Cohen \cite{McCloskey89} and has since produced
 a taxonomy of strategies that spans regularization, replay and architectural
 design \cite{parisi2019continual, Lange22, Wang24}. Elastic weight
-consolidation introduces a quadratic penalty weighted by the diagonal of the
+consolidation adds a quadratic penalty weighted by the diagonal of the
 Fisher information matrix \cite{kirkpatrick2017overcoming}, and synaptic
 intelligence replaces the Fisher estimate with an online accumulation of
 parameter importance \cite{Zenke17}. Replay-based approaches
@@ -289,10 +289,10 @@ observes the training data of task $t$ while training on task $t$ and, in the
 strictest form of the problem, keeps no access to the data of previous
 tasks. Two scenarios are distinguished after van de Ven et
 al.~\cite{Ven22}. In task-incremental learning the task identity is known at
-test time and a shared head evaluates the corresponding decision boundary.
+test time and a shared head scores the corresponding decision boundary.
 In class-incremental learning the task identity is unknown and a single
 output layer must separate classes drawn from every task seen so far. The
-present study evaluates the task-incremental scenario and the analysis of
+present study examines the task-incremental scenario and the analysis of
 class-incremental behavior is left to the extended protocol described in
 Section~\ref{sec:discussion}.
 
@@ -321,7 +321,7 @@ where $\mathrm{Acc}_A^{\text{init}}$ is the accuracy on Task A measured at
 the end of the Task A phase and $\mathrm{Acc}_A^{\text{final}}$ is the same
 accuracy measured after the Task B phase, on the frozen Task A test set. The
 relative retention $r_A = \mathrm{Acc}_A^{\text{final}} /
-\mathrm{Acc}_A^{\text{init}}$ is reported alongside $\Delta_A$, because the
+\mathrm{Acc}_A^{\text{init}}$ is reported together with $\Delta_A$, because the
 absolute drop alone rewards classifiers that never learned the first task.
 
 Two properties fix the role of $\Delta_A$ among these quantities. First, for
@@ -337,10 +337,10 @@ $\Delta_A$ is used because it is the quantity reported by the earlier
 conference version of this study, and it embeds directly into the
 $\mathrm{BWT}$ and $\mathrm{AF}$ definitions as the sequence grows. Second,
 $\Delta_A$ is bounded above by $\mathrm{Acc}_A^{\text{init}}$, so a
-classifier that never acquires Task A cannot lose much and exhibits a small
+classifier that never acquires Task A cannot lose much and shows a small
 drop for the wrong reason. The drop is therefore read jointly with
 $\mathrm{Acc}_A^{\text{init}}$ and $r_A$, and
-Section~\ref{sec:results} exhibits this failure mode in the topology
+Section~\ref{sec:results} shows this failure mode in the topology
 comparison, where the least accurate architecture shows the smallest drop.
 
 % ======================================================================
@@ -878,7 +878,10 @@ split-MNIST gives
 19.97 against 20.57 (0.204).
 Table~\ref{tab:e234_bench5} collects the four AA/AF/BWT/FWT metrics per
 arm and Figure~\ref{fig:e234_bench5} the retention of the first task
-along the five phases. The standard class-incremental benchmarks therefore
+along the five phases. Figure~\ref{fig:e234_remedies} reads the same
+benchmark at the level of the full accuracy matrices: the plain and prior
+arms collapse to zero on every earlier task, while rehearsal preserves
+about sixty percent of the first task after the whole sequence. The standard class-incremental benchmarks therefore
 do not reproduce the retention advantage that the two-task protocol of
 Experiment~1 attributes to the synthetic prior: the prior remains a
 neutral initialization at this scale, and the arms that explicitly trade
@@ -896,6 +899,17 @@ ten seeds with one standard-deviation bands.}\label{fig:e234_bench5}
 \end{figure}
 
 \input{tables/tab_e234_bench5.tex}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=\linewidth]{figures/fig_e234_remedies.pdf}
+\caption{Class-incremental accuracy matrices of the four benchmark arms on
+split-MNIST, mean over ten seeds. The plain model and the synthetic prior
+lose every earlier task, while rehearsal preserves 60.5 percent of the
+first task and lifts the average accuracy by 15.5 points. Elastic weight
+consolidation does not retain at this model scale, which isolates the
+retention gain to the memory-based remedy.}\label{fig:e234_remedies}
+\end{figure}
 
 
 \subsection{Regularization family and interaction with the synthetic prior}
@@ -1014,7 +1028,7 @@ every configuration
 (4q/3L +3.05, 0.108, 6q/3L -0.85, 0.585, 8q/3L -0.55, 0.868, 4q/2L -2.45, 0.334, 4q/4L +0.00, 1.000).
 Adding qubits at fixed depth and changing depth at four qubits leave both
 the accuracy level and the forgetting profile within the seed spread
-(Figure~\ref{fig:e234_scaling}), while the per-epoch wall-clock grows
+(Figure~\ref{fig:e234_scaling}), while the per-epoch elapsed time grows
 by roughly a factor of 2.3
 from four to eight qubits at fixed depth, consistent with the
 state-vector simulation cost. The resource accounting of the same grid
@@ -1032,7 +1046,7 @@ the two-task binary setting rather than a generic property of the method.
 \centering
 \includegraphics[width=\linewidth]{figures/fig_e234_scaling.pdf}
 \caption{E4 scaling grid (ideal profile, ten seeds). (a) Task-A forgetting
-drop and (b) mean accuracy for the five configurations, (c) mean wall-clock
+drop and (b) mean accuracy for the five configurations, (c) mean elapsed time
 per epoch on one CPU core.}\label{fig:e234_scaling}
 \end{figure}
 
@@ -1160,7 +1174,7 @@ two task optima (fixed 300-sample subsets).}\label{fig:e5}
 
 The results support a precise and bounded reading of synthetic cross-domain
 pre-training. The controlled factorial re-run redistributes the effect that
-the original protocol attributed to the initialization. The apparent
+the original protocol ascribed to the initialization. The apparent
 reduction of the forgetting drop, of about six points in the uncontrolled
 comparison, is carried by the learning-rate regime, which accounts for
 about five points under matched schedules, while the synthetic
@@ -1211,10 +1225,10 @@ the sequences contain up to five tasks, and the noise model, while
 calibrated on a current device generation, is simulated rather than
 executed on hardware. The second is the evaluation scenario. The extended
 protocol now covers the class-incremental setting of the classical
-benchmarks \cite{Ven22} alongside the task-incremental setting of the
-original protocol, and the null reading holds in both. The third is the
+benchmarks \cite{Ven22} together with the task-incremental setting of the
+original protocol, and the null reading persists in both. The third is the
 classical share of the pipeline. The MobileNetV2 feature extraction and
-the principal-component reduction dominate the wall-clock cost of the image
+the principal-component reduction dominate the processing cost of the image
 sources, which bounds any practical advantage that the quantum head could
 claim in the current configuration.
 
@@ -1237,7 +1251,7 @@ This study characterized cross-domain synthetic pre-training as a
 memory-free initialization for sequential quantum classifiers through a
 controlled factorial design and a benchmark campaign of 650 training runs.
 The controlled evidence relocates the effect that the original protocol
-attributed to the initialization. Under matched learning rates the
+ascribed to the initialization. Under matched learning rates the
 synthetic prior produces no significant change in forgetting, while the
 optimization regime carries a reduction of about five points, and the null
 reading of the initialization is stable across class-incremental
