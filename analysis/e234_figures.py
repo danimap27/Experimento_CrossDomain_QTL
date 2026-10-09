@@ -110,7 +110,9 @@ def fig_scenarios(runs: Runs):
             for i, row in enumerate(mat):
                 for jj, v in enumerate(row):
                     M[i, jj] = np.nanmean([M[i, jj], v])
-        im = ax.imshow(M, vmin=0, vmax=100, cmap="viridis")
+        cmap = plt.get_cmap("viridis").copy()
+        cmap.set_bad("#e8e8e8")  # not-yet-evaluated cells: neutral grey, not a 0.0
+        im = ax.imshow(M, vmin=0, vmax=100, cmap=cmap)
         ax.set_xticks(range(T), [f"T{i+1}" for i in range(T)])
         ax.set_yticks(range(T), [f"after T{i+1}" for i in range(T)])
         ax.set_xlabel("evaluated task")
@@ -119,7 +121,7 @@ def fig_scenarios(runs: Runs):
                 v = M[i, jj]
                 ax.text(jj, i, f"{v:.1f}", ha="center", va="center",
                         color="white" if v < 60 else "black", fontsize=8)
-        ax.set_title(f"class-IL accuracy matrix — {arm} (ideal, mean over seeds)")
+        ax.set_title(f"class-IL accuracy matrix — {arm}\n(ideal, mean over seeds)", fontsize=10)
         cbar = fig.colorbar(im, ax=ax, fraction=0.045, pad=0.03)
         cbar.set_label("accuracy (%)", fontsize=8)
     out = FIGDIR / "fig_e234_scenarios.pdf"
